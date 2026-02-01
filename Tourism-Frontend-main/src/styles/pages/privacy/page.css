@@ -1,0 +1,29 @@
+@import '../../globals.css';
+
+div.privacy-page {
+    @apply max-w-4xl mx-auto p-6;
+
+    h1.privacy-heading {
+        @apply text-5xl text-c3 text-center font-semibold mb-4;
+    }
+
+    p.privacy-content {
+        @apply text-lg leading-relaxed text-center mb-8;
+    }
+
+    section.policy-section {
+        @apply py-6;
+    }
+
+    h2.section-title {
+        @apply text-3xl text-c2 font-semibold mb-2;
+    }
+
+    p.section-content {
+        @apply text-base leading-relaxed;
+    }
+
+    a.contact-link {
+        @apply font-semibold text-c1 hover:underline;
+    }
+}

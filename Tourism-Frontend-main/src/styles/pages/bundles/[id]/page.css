@@ -1,0 +1,119 @@
+@import '../../../globals.css';
+
+div.bundle-page {
+    @apply flex flex-col;
+
+    section.bundle-hero {
+        @apply relative h-72 text-white flex bg-linear-to-r from-c2 to-c3 items-end p-6 overflow-hidden;
+    }
+
+    section.bundle-hero div.overlay {
+        @apply absolute inset-0 bg-black/30;
+    }
+
+    section.bundle-hero div.bundle-hero-content {
+        @apply relative w-full flex justify-between items-end text-white z-10;
+    }
+
+    section.bundle-location {
+        @apply flex justify-between not-sm:flex-col gap-6 p-6 bg-gray-50 rounded-lg;
+    }
+
+    h1.bundle-title {
+        @apply text-3xl font-bold;
+    }
+
+    p.bundle-desc {
+        @apply text-sm mt-2 max-w-xl;
+    }
+
+    div.bundle-action {
+        @apply flex flex-col items-end gap-3 text-right;
+    }
+
+    div.bundle-price {
+        @apply text-2xl text-white;
+    }
+
+    button.book-btn {
+        @apply bg-c2 cursor-pointer hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold transition-colors text-white;
+    }
+
+    p.not-logged-in {
+        @apply italic text-gray-300 text-right text-sm;
+    }
+
+    p.not-logged-in span {
+        @apply cursor-pointer text-white underline hover:text-c2;
+    }
+
+    p.inactive-label {
+        @apply bg-red-600/80 text-white px-4 py-2 rounded-lg font-semibold shadow;
+    }
+
+    span.price-unit {
+        @apply text-sm text-gray-300;
+    }
+
+    img.location-img {
+        @apply sm:w-80 sm:h-56 w-full object-cover rounded-lg shadow-md flex-shrink-0;
+    }
+
+    div.location-text {
+        @apply flex-1 flex flex-col gap-3;
+    }
+
+    h2.section-heading {
+        @apply text-xl font-semibold text-c3;
+    }
+
+    p.location-note {
+        @apply text-gray-600 leading-relaxed;
+    }
+
+    span.highlight {
+        @apply font-semibold text-gray-900;
+    }
+
+    h3.location-title {
+        @apply text-xl font-semibold text-c3;
+    }
+
+    p.location-desc {
+        @apply text-gray-600 leading-relaxed;
+    }
+
+    section.bundle-products {
+        @apply mt-8 px-6;
+    }
+
+    section.bundle-products h2.section-heading {
+        @apply text-xl font-semibold text-c3 mb-4;
+    }
+
+    div.tabs-header {
+        @apply flex flex-wrap gap-4 border-b border-gray-200 mb-6 overflow-x-auto max-w-full;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    div.tabs-header::-webkit-scrollbar {
+        @apply hidden;
+    }
+
+    button.tab-btn {
+        @apply pb-2 cursor-pointer text-gray-500 hover:text-c1 transition-colors;
+    }
+
+    button.tab-btn.active {
+        @apply border-b-2 border-c1 text-c1;
+    }
+
+    p.no-products {
+        @apply text-center text-gray-500 italic;
+    }
+
+    div.cards-grid {
+        @apply grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-6;
+    }
+}

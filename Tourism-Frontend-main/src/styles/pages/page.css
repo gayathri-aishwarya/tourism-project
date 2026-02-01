@@ -1,0 +1,82 @@
+@import '../globals.css';
+
+div.home-page {
+    @apply flex flex-col;
+
+    h2.section-title {
+        @apply text-3xl font-semibold text-c3 mb-2;
+    }
+
+    p.section-subtitle {
+        @apply text-sm text-gray-500 mb-8;
+    }
+
+    p.not-found-text {
+        @apply text-center text-gray-500 italic;
+    }
+
+    section.hero-section {
+        @apply bg-cover bg-center text-center text-white py-24 relative;
+    }
+
+    div.home-hero-content {
+        @apply bg-black/20 p-4 sm:p-8 rounded-xl w-full max-w-full sm:max-w-2xl mx-auto;
+    }
+
+    h1.hero-title {
+        @apply text-3xl sm:text-4xl font-bold mb-4 text-c3;
+    }
+
+    p.hero-subtitle {
+        @apply text-base sm:text-lg mb-6 text-white;
+    }
+
+    button.program-btn {
+        @apply bg-c2 text-white font-semibold px-6 sm:px-8 py-2 sm:py-3 rounded-lg shadow-md
+        transition duration-300 cursor-pointer mt-4;
+    }
+
+    section.locations-section {
+        @apply text-center py-16 px-4;
+    }
+
+    div.locations-grid {
+        @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl mx-auto;
+    }
+
+    section.services-section {
+        @apply text-center py-8 px-4;
+    }
+
+    div.services-grid {
+        @apply flex flex-wrap justify-center gap-12 mt-8;
+    }
+
+    div.service-card {
+        @apply flex flex-col items-center text-c2 text-lg;
+    }
+
+    div.service-icon {
+        @apply text-7xl mb-4;
+    }
+
+    span.service-label {
+        @apply font-semibold text-xl;
+    }
+
+    section.bestseller-section {
+        @apply text-center py-16 px-4;
+    }
+
+    div.bestseller-grid {
+        @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-6xl mx-auto;
+    }
+
+    section.reviews-section {
+        @apply text-center py-16 px-4;
+    }
+
+    div.reviews-grid {
+        @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-6xl mx-auto;
+    }
+}

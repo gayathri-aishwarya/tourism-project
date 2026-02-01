@@ -1,0 +1,5 @@
+@import '../../globals.css';
+
+main {
+    @apply flex-1 pb-10;
+}

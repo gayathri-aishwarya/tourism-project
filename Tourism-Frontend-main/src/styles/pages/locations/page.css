@@ -1,0 +1,25 @@
+@import '../../globals.css';
+
+div.locations-page {
+    @apply max-w-6xl mx-auto;
+
+    section.locations-section {
+        @apply py-16 px-4;
+    }
+
+    h2.section-title {
+        @apply text-3xl font-semibold text-c3 mb-2;
+    }
+
+    p.section-subtitle {
+        @apply text-sm text-gray-500 mb-8;
+    }
+
+    p.no-locations {
+        @apply text-center text-gray-500 italic;
+    }
+
+    div.locations-grid {
+        @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-6xl mx-auto;
+    }
+}

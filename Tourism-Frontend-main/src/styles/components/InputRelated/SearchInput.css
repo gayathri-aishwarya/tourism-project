@@ -1,0 +1,27 @@
+@import '../../globals.css';
+
+form.search-bar-modern {
+    @apply flex items-center gap-2 bg-white rounded-full shadow-md border border-gray-200 px-2 py-2
+    w-full mx-auto min-w-0;
+    @apply transition-all duration-200 overflow-hidden;
+}
+
+form.search-bar-modern:focus-within {
+    @apply shadow-lg border-c1;
+}
+
+.search-icon {
+    @apply ml-2 text-gray-500 text-xl shrink-0;
+}
+
+form.search-bar-modern input {
+    @apply flex-1 bg-transparent outline-none text-base text-black placeholder-gray-400 min-w-0;
+}
+
+button.search-btn-modern {
+    @apply bg-c1 text-white px-4 py-2 rounded-full font-medium transition duration-200 cursor-pointer shrink-0;
+}
+
+button.search-btn-modern:hover {
+    @apply brightness-110;
+}

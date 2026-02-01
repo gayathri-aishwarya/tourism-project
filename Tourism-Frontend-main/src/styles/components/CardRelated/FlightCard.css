@@ -1,0 +1,55 @@
+@import '../../globals.css';
+
+a.flight-card {
+    @apply rounded-lg shadow-md overflow-hidden bg-white flex flex-col h-full;
+
+    &.inactive {
+        @apply relative opacity-60 pointer-events-none;
+    }
+
+    div.inactive-overlay {
+        @apply absolute inset-0 flex items-center justify-center bg-black/50 text-white
+        text-lg backdrop-blur-sm font-bold z-50;
+    }
+
+    img.flight-card-img {
+        @apply w-full h-48 object-cover;
+    }
+
+    div.flight-card-content {
+        @apply p-4 text-left flex flex-col flex-grow justify-between;
+
+        > *:not(:last-child) {
+            @apply mb-1;
+        }
+
+        p.flight-airline {
+            @apply text-sm text-gray-500;
+        }
+
+        h3.flight-route {
+            @apply text-lg font-bold flex items-center;
+        }
+
+        div.flight-info {
+            @apply flex items-center gap-4 text-sm text-gray-500;
+
+            span.flight-date,
+            span.flight-time {
+                @apply flex items-center gap-1;
+            }
+        }
+
+        div.flight-footer {
+            @apply flex justify-between items-center text-sm text-gray-500 mt-auto;
+
+            span.flight-duration {
+                @apply flex font-bold items-center gap-1;
+            }
+
+            span.flight-price p {
+                @apply inline font-bold text-black;
+            }
+        }
+    }
+}

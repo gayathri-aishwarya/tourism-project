@@ -1,0 +1,25 @@
+@import '../../globals.css';
+
+div.contact-page {
+    @apply max-w-4xl mx-auto p-6;
+
+    h1.contact-heading {
+        @apply text-5xl text-center text-c3 font-semibold mb-4;
+    }
+
+    p.contact-content {
+        @apply text-lg leading-relaxed text-center mb-8;
+    }
+
+    section.contact-section {
+        @apply py-6;
+    }
+
+    h2.section-title {
+        @apply text-3xl text-c2 font-semibold mb-2;
+    }
+
+    p.section-content {
+        @apply text-base leading-relaxed;
+    }
+}

@@ -1,0 +1,87 @@
+@import '../../globals.css';
+
+nav {
+    @apply flex items-center bg-white h-(--nav-height) shadow-lg fixed w-full z-[999];
+
+    div.container {
+        @apply grid grid-cols-3 not-lg:flex not-lg:justify-between;
+
+        div.left,
+        div.mid,
+        div.right {
+            @apply flex items-center;
+        }
+
+        div.left {
+            a.go-to-home {
+                @apply flex items-center gap-4;
+
+                div.logo-only-wrapper,
+                div.logo-words-wrapper {
+                    @apply h-full flex items-center justify-center;
+                }
+
+                div.logo-only-wrapper {
+                    @apply w-12;
+                }
+
+                div.logo-words-wrapper {
+                    @apply w-36 not-lg:hidden;
+                }
+            }
+        }
+
+        div.mid {
+            @apply justify-center gap-8 not-lg:gap-2 not-lg:col-span-2;
+
+            a.nav-button-mid {
+                @apply w-fit flex gap-1 py-1 hover:border-b-2 items-center transition-colors;
+
+                .nav-icon {
+                    @apply text-lg text-black;
+                }
+
+                p {
+                    @apply not-sm:hidden;
+                }
+
+                &.active-link {
+                    @apply text-c2;
+
+                    .nav-icon {
+                        @apply text-c2;
+                    }
+                }
+            }
+        }
+
+        div.right {
+            @apply justify-end gap-4 not-lg:justify-center not-lg:flex-col not-lg:gap-2;
+
+            a,
+            button {
+                @apply text-center cursor-pointer not-lg:text-sm;
+
+                &.secondary-link {
+                    @apply text-c2 border-2 px-3 not-lg:px-2 py-1.5 rounded-lg border-c2;
+                }
+            }
+
+            .nav-user-btn {
+                @apply flex items-center gap-2 text-c2 font-semibold;
+
+                .nav-user-name {
+                    @apply not-sm:hidden;
+                }
+
+                .nav-user-icon {
+                    @apply text-xl rounded-full w-5 h-5;
+                }
+            }
+
+            button.nav-logout-btn {
+                @apply text-xl text-black hover:text-red-500 transition;
+            }
+        }
+    }
+}

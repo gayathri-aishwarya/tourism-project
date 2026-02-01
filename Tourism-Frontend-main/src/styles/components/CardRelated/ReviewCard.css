@@ -1,0 +1,18 @@
+@import '../../globals.css';
+
+div.review-card {
+    @apply rounded-lg shadow-md overflow-hidden bg-white h-full transition
+    hover:shadow-lg p-6 text-left;
+
+    div.review-header {
+        @apply flex justify-between items-center mb-2;
+    }
+
+    span.review-name {
+        @apply font-semibold;
+    }
+
+    p.review-text {
+        @apply text-sm text-gray-600;
+    }
+}

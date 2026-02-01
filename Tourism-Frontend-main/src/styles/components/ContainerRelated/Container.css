@@ -1,0 +1,9 @@
+@import '../../globals.css';
+
+div.container {
+    @apply w-full max-w-screen-2xl mx-auto p-4;
+
+    &.no-padding {
+        @apply p-0;
+    }
+}

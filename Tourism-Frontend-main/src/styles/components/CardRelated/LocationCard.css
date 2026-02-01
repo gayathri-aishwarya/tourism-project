@@ -1,0 +1,14 @@
+@import '../../globals.css';
+
+a.location-card {
+    @apply relative overflow-hidden rounded-lg shadow-md transition
+    hover:shadow-lg;
+
+    img.location-img {
+        @apply w-full h-48 object-cover;
+    }
+
+    span.location-name {
+        @apply absolute font-bold bottom-2 left-2 bg-white text-black px-3 py-1 rounded;
+    }
+}

@@ -1,0 +1,33 @@
+@import '../../globals.css';
+
+div.about-page {
+    @apply max-w-4xl mx-auto p-6;
+
+    h1.about-heading {
+        @apply text-5xl text-center font-semibold mb-4 text-c3;
+    }
+
+    section.services-section {
+        @apply text-center py-8 px-4;
+    }
+
+    h2.section-title {
+        @apply text-3xl font-semibold text-c3 mb-2;
+    }
+
+    div.services-grid {
+        @apply flex flex-wrap justify-center gap-12 mt-8;
+    }
+
+    div.service-card {
+        @apply flex flex-col items-center text-c2 text-lg;
+    }
+
+    div.service-icon {
+        @apply text-7xl mb-4;
+    }
+
+    span.service-label {
+        @apply font-semibold text-xl;
+    }
+}

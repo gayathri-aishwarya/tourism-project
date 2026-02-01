@@ -1,0 +1,80 @@
+@import '../../globals.css';
+
+div.dashboard-page {
+    @apply px-6 py-8;
+
+    section.holidays-section {
+        @apply mb-10 px-8;
+    }
+
+    h2.holidays-title {
+        @apply text-2xl font-semibold text-c3 mb-2;
+    }
+
+    p.holidays-subtitle {
+        @apply text-sm text-gray-500 mb-6;
+    }
+
+    p.holidays-loading,
+    p.holidays-empty {
+        @apply text-gray-500 italic;
+    }
+
+    div.holidays-grid {
+        @apply grid gap-4 md:grid-cols-2 lg:grid-cols-3;
+    }
+
+    div.holiday-card {
+        @apply p-4 rounded-2xl shadow-md bg-white border border-gray-100 hover:shadow-lg transition;
+    }
+
+    h3.holiday-name {
+        @apply text-lg font-semibold text-gray-800 mb-1;
+    }
+
+    p.holiday-date {
+        @apply text-sm text-gray-500 font-bold mb-2;
+    }
+
+    p.holiday-description {
+        @apply text-sm text-gray-600 line-clamp-3;
+    }
+
+    hr.dashboard-separator {
+        @apply mx-8 my-10 border-t border-gray-300;
+    }
+
+    section.tabs-section {
+        @apply mt-8 px-8;
+    }
+
+    h2.tabs-title {
+        @apply text-2xl font-semibold text-c3 mb-1;
+    }
+
+    p.tabs-subtitle {
+        @apply text-sm text-gray-500 mb-6;
+    }
+
+    div.tabs-header {
+        @apply flex flex-wrap gap-4 border-b border-gray-200 mb-6 overflow-x-auto max-w-full;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    div.tabs-header::-webkit-scrollbar {
+        @apply hidden;
+    }
+
+    button.tab-btn {
+        @apply pb-2 cursor-pointer text-gray-500 hover:text-gray-800 transition-colors whitespace-nowrap;
+
+        &.active {
+            @apply border-b-2 border-gray-800 text-gray-800;
+        }
+    }
+}
+
+div.permissions-text {
+    @apply px-6 py-8 text-center text-gray-500 italic;
+}

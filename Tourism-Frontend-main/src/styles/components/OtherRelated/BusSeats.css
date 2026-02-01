@@ -1,0 +1,74 @@
+@import '../../globals.css';
+
+div.seats-layout-container {
+    @apply flex flex-col gap-4 items-center w-full;
+}
+
+/* Header Bar */
+div.seats-header {
+    @apply flex justify-between w-full max-w-md bg-white shadow px-4 py-2 rounded-md text-sm font-medium text-gray-700;
+}
+
+div.seats-header span {
+    @apply text-sm flex gap-2;
+}
+
+div.seats-header p {
+    @apply text-c3 font-bold;
+}
+
+div.seats-header p.stats-booked {
+    @apply text-red-500;
+}
+
+div.seats-header p.stats-selected {
+    @apply text-c1;
+}
+
+/* Bus Container */
+div.bus-container {
+    @apply bg-gray-100 border-2 border-gray-300 shadow-md rounded-2xl p-4 flex flex-col items-center gap-4;
+}
+
+div.bus-front {
+    @apply w-full text-center text-sm font-bold text-white py-1 rounded-lg bg-c2
+    flex items-center justify-center gap-1 mb-2;
+}
+
+/* Layout */
+div.seats-layout {
+    @apply flex flex-col gap-2 items-center w-full;
+}
+
+div.seat-row {
+    @apply flex items-center gap-4;
+}
+
+div.seat-side {
+    @apply flex gap-1;
+}
+
+div.aisle {
+    @apply w-6;
+}
+
+/* Seat */
+div.seat {
+    @apply flex flex-col items-center text-xs font-bold cursor-pointer transition;
+}
+
+div.seat svg {
+    @apply w-6 h-6; /* smaller size */
+}
+
+div.seat.available {
+    @apply text-c3 hover:text-green-800;
+}
+
+div.seat.booked {
+    @apply text-red-500 cursor-not-allowed;
+}
+
+div.seat.selected {
+    @apply text-c1 drop-shadow-md drop-shadow-c1 animate-pulse;
+}

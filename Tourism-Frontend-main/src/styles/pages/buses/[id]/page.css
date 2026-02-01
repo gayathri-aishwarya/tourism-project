@@ -1,0 +1,89 @@
+@import '../../../globals.css';
+
+div.bus-page {
+    @apply flex flex-col;
+
+    section.bus-hero {
+        @apply relative h-80 bg-cover bg-center flex items-end p-6;
+    }
+
+    section.bus-hero div.overlay {
+        @apply absolute inset-0 backdrop-blur-sm bg-black/40;
+    }
+
+    section.bus-hero div.bus-hero-content {
+        @apply relative w-full flex justify-between items-end text-white z-10;
+    }
+
+    h1.bus-title {
+        @apply text-3xl font-bold;
+    }
+
+    p.bus-location {
+        @apply text-sm mt-1 flex items-center gap-1;
+    }
+
+    p.bus-location .location-icon {
+        @apply text-red-500;
+    }
+
+    button.book-btn {
+        @apply bg-c2 cursor-pointer hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold transition-colors;
+    }
+
+    p.not-logged-in {
+        @apply italic text-gray-300 text-right text-sm;
+    }
+
+    p.not-logged-in span {
+        @apply cursor-pointer text-white underline hover:text-c2;
+    }
+
+    p.inactive-label {
+        @apply bg-red-600/80 text-white px-4 py-2 rounded-lg font-semibold shadow;
+    }
+
+    section.bus-info {
+        @apply px-6 py-6 flex flex-col sm:flex-row flex-wrap gap-6 bg-gray-50;
+    }
+
+    div.info-item {
+        @apply flex items-center gap-3 text-gray-700;
+    }
+
+    svg.info-icon {
+        @apply text-c3 text-lg;
+    }
+
+    span.info-text {
+        @apply leading-tight text-gray-800;
+    }
+
+    section.bus-details {
+        @apply p-6 flex flex-col gap-6;
+    }
+
+    div.detail-group {
+        @apply bg-white shadow-sm p-4 rounded-lg;
+    }
+
+    div.detail-group ul {
+        @apply flex flex-wrap gap-6;
+    }
+
+    div.detail-group ul li {
+        @apply flex items-center gap-2;
+    }
+
+    div.detail-group ul li svg {
+        @apply text-c2;
+    }
+
+    h2.section-title {
+        @apply text-lg font-semibold text-c3 mb-2;
+    }
+
+    p.desc-text {
+        @apply text-gray-600 leading-relaxed;
+    }
+}

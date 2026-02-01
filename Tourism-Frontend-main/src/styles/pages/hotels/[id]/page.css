@@ -1,0 +1,119 @@
+@import '../../../globals.css';
+
+div.hotel-page {
+    @apply flex flex-col;
+
+    section.hotel-hero {
+        @apply relative h-80 bg-cover bg-center flex items-end p-6;
+    }
+
+    section.hotel-hero div.overlay {
+        @apply absolute inset-0 backdrop-blur-sm bg-black/40;
+    }
+
+    section.hotel-hero div.hotel-hero-content {
+        @apply relative w-full flex justify-between items-end text-white z-10;
+    }
+
+    h1.hotel-title {
+        @apply text-3xl font-bold;
+    }
+
+    p.hotel-location {
+        @apply text-sm mt-1 flex items-center gap-1;
+    }
+
+    p.hotel-location .location-icon {
+        @apply text-red-500;
+    }
+
+    button.book-btn {
+        @apply bg-c2 cursor-pointer hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold transition-colors;
+    }
+
+    p.not-logged-in {
+        @apply italic text-gray-300 text-right text-sm;
+    }
+
+    p.inactive-label {
+        @apply bg-red-600/80 text-white px-4 py-2 rounded-lg font-semibold shadow;
+    }
+
+    p.not-logged-in span {
+        @apply cursor-pointer text-white underline hover:text-c2;
+    }
+
+    div.hotel-rating span.star {
+        @apply text-sm mr-1;
+    }
+
+    div.hotel-rating span.full {
+        @apply text-c2;
+    }
+
+    div.hotel-rating span.half {
+        @apply relative bg-[linear-gradient(to_right,#f26522_50%,#d1d5db_50%)] bg-clip-text text-transparent;
+    }
+
+    div.hotel-rating span.empty {
+        @apply text-gray-300;
+    }
+
+    section.hotel-info {
+        @apply px-6 py-6 flex flex-col sm:flex-row flex-wrap gap-6 bg-gray-50;
+    }
+
+    div.info-item {
+        @apply flex items-center gap-3 text-gray-700;
+    }
+
+    svg.info-icon {
+        @apply text-c3 text-lg;
+    }
+
+    span.info-text {
+        @apply leading-tight text-gray-800;
+    }
+
+    section.hotel-details {
+        @apply p-6 flex flex-col gap-6;
+    }
+
+    div.detail-group {
+        @apply bg-white shadow-sm p-4 rounded-lg;
+    }
+
+    h2.section-title {
+        @apply text-lg font-semibold text-c3 mb-2;
+    }
+
+    p.desc-text {
+        @apply text-gray-600 leading-relaxed;
+    }
+
+    ul.amenities-list,
+    ul.available-rooms-list {
+        @apply grid grid-cols-1 sm:grid-cols-2 gap-3;
+    }
+
+    ul.amenities-list li,
+    ul.available-rooms-list li {
+        @apply flex items-center gap-2 text-gray-700;
+    }
+
+    svg.amenity-icon {
+        @apply text-c2;
+    }
+
+    section.reviews-section {
+        @apply flex flex-col gap-2;
+    }
+
+    h2.reviews-title {
+        @apply text-lg font-semibold text-c3;
+    }
+
+    div.reviews-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+    }
+}

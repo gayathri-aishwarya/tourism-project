@@ -1,0 +1,117 @@
+@import '../../globals.css';
+
+div.profile-page {
+    @apply px-6 py-8 flex flex-col items-center justify-center;
+}
+
+section.profile-card {
+    @apply w-full max-w-3xl bg-white rounded-2xl shadow-lg p-8 border border-gray-200;
+}
+
+div.profile-header {
+    @apply flex items-center gap-6 mb-8;
+}
+
+img.profile-image {
+    @apply w-24 h-24 rounded-full object-cover border border-gray-200 shadow;
+}
+
+.profile-placeholder {
+    @apply w-24 h-24 text-gray-400;
+}
+
+h1.profile-name {
+    @apply text-2xl font-semibold text-gray-800;
+}
+
+p.profile-role {
+    @apply text-sm text-gray-500;
+}
+
+.table-container {
+    @apply overflow-x-auto bg-white rounded-xl shadow border border-gray-200;
+}
+
+table.profile-table {
+    @apply w-full text-sm text-left border-collapse min-w-[480px];
+}
+
+table.profile-table th,
+table.profile-table td {
+    @apply px-4 py-3 border-b border-gray-200 align-middle;
+}
+
+table.profile-table th {
+    @apply font-medium text-gray-600 w-[35%] bg-gray-50;
+}
+
+table.profile-table td {
+    @apply text-gray-800;
+}
+
+table.profile-table tbody tr:hover {
+    @apply bg-gray-50;
+}
+
+.profile-empty {
+    @apply text-gray-500 italic text-center mt-12;
+}
+/* My Bookings Section */
+section.bookings-card {
+    @apply w-full max-w-3xl bg-white rounded-2xl shadow-lg p-8 border border-gray-200 mt-10;
+}
+
+h2.section-title {
+    @apply text-xl font-semibold text-gray-800 mb-6;
+}
+
+table.bookings-table {
+    @apply w-full text-sm text-left border-collapse min-w-[480px];
+}
+
+table.bookings-table th,
+table.bookings-table td {
+    @apply px-4 py-3 border-b border-gray-200 align-middle;
+}
+
+table.bookings-table th {
+    @apply font-medium text-gray-600 bg-gray-50;
+}
+
+table.bookings-table td {
+    @apply text-gray-800;
+}
+
+table.bookings-table tbody tr:hover {
+    @apply bg-gray-50;
+}
+
+.no-bookings {
+    @apply text-gray-500 italic text-center py-6;
+}
+
+/* Status chips (reuse styles from dashboard if available) */
+.status-chip {
+    @apply inline-block px-3 py-1 rounded-full text-xs font-medium;
+}
+.status-pending {
+    @apply bg-yellow-100 text-yellow-800;
+}
+.status-confirmed {
+    @apply bg-blue-100 text-blue-800;
+}
+.status-paid {
+    @apply bg-green-100 text-green-800;
+}
+.status-cancelled {
+    @apply bg-red-100 text-red-800;
+}
+.payment-pending {
+    @apply bg-yellow-100 text-yellow-800;
+}
+.payment-paid {
+    @apply bg-green-100 text-green-800;
+}
+.payment-failed {
+    @apply bg-red-100 text-red-800;
+}

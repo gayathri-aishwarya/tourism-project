@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@theme {
+    /* Heights */
+    --nav-height: 120px;
+
+    /* Colors */
+    --color-c1: #2199cc;
+    --color-c2: #f26522;
+    --color-c3: #19804c;
+    --color-c4: #04ef62;
+    --color-c5: #d9d9d9;
+
+    /* Social Media Colors */
+    --color-google: #ea4335;
+    --color-facebook: #1877f2;
+}
+
+@layer base {
+    body {
+        @apply flex min-h-screen flex-col;
+    }
+}

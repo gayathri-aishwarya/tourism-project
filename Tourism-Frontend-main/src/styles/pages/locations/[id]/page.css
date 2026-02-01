@@ -1,0 +1,59 @@
+@import '../../../globals.css';
+
+div.location-page {
+    @apply flex flex-col;
+
+    section.location-hero {
+        @apply relative h-64 bg-cover bg-center;
+    }
+
+    section.location-hero div.overlay {
+        @apply absolute inset-0 backdrop-blur-sm bg-black/40;
+    }
+
+    section.location-info {
+        @apply flex justify-between not-sm:flex-col gap-6 p-8;
+    }
+
+    h1.location-title {
+        @apply text-2xl font-bold text-green-700 mb-2;
+    }
+
+    p.location-desc {
+        @apply text-gray-600 max-w-xl leading-relaxed;
+    }
+
+    img.location-side-img {
+        @apply w-full md:w-72 rounded-lg shadow-md;
+    }
+
+    section.location-tabs {
+        @apply mt-8 px-8;
+    }
+
+    div.tabs-header {
+        @apply flex flex-wrap gap-4 border-b border-gray-200 mb-6 overflow-x-auto max-w-full;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    div.tabs-header::-webkit-scrollbar {
+        @apply hidden;
+    }
+
+    button.tab-btn {
+        @apply pb-2 cursor-pointer text-gray-500 hover:text-c1 transition-colors whitespace-nowrap;
+    }
+
+    button.tab-btn.active {
+        @apply border-b-2 border-c1 text-c1;
+    }
+
+    p.no-products {
+        @apply text-center text-gray-500 italic;
+    }
+
+    div.cards-grid {
+        @apply grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-6;
+    }
+}

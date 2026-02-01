@@ -1,0 +1,55 @@
+@import '../../globals.css';
+
+a.bus-card {
+    @apply rounded-lg shadow-md overflow-hidden bg-white flex flex-col h-full;
+
+    &.inactive {
+        @apply relative opacity-60 pointer-events-none;
+    }
+
+    div.inactive-overlay {
+        @apply absolute inset-0 flex items-center justify-center bg-black/50 text-white
+        text-lg backdrop-blur-sm font-bold z-50;
+    }
+
+    img.bus-card-img {
+        @apply w-full h-48 object-cover;
+    }
+
+    div.bus-card-content {
+        @apply p-4 text-left flex flex-col flex-grow justify-between;
+
+        > *:not(:last-child) {
+            @apply mb-1;
+        }
+
+        h3.bus-title {
+            @apply text-lg font-bold;
+        }
+
+        p.bus-seats {
+            @apply text-sm text-c2 font-bold flex items-center gap-1;
+        }
+
+        div.bus-info {
+            @apply flex items-center gap-4 text-sm text-gray-500;
+
+            span.bus-date,
+            span.bus-time {
+                @apply flex items-center gap-1;
+            }
+        }
+
+        div.bus-footer {
+            @apply flex justify-between items-center text-sm text-gray-500 mt-auto;
+
+            span.bus-wifi {
+                @apply flex font-bold items-center gap-1;
+            }
+
+            span.bus-price p {
+                @apply inline font-bold text-black;
+            }
+        }
+    }
+}

@@ -1,0 +1,89 @@
+@import '../../globals.css';
+
+div.modal-overlay {
+    @apply fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50;
+
+    form.modal {
+        @apply bg-white rounded-lg shadow-xl w-[90%] max-w-md mx-auto p-6 relative flex flex-col gap-4;
+
+        button.close-btn {
+            @apply absolute top-3 right-4 text-2xl text-gray-700 hover:text-red-500 cursor-pointer;
+        }
+
+        h2.modal-title {
+            @apply text-lg font-semibold text-c2;
+        }
+
+        div.error-msg {
+            @apply text-red-500 leading-tight;
+        }
+
+        input.modal-input {
+            @apply w-full px-3 py-2 text-sm rounded-lg border border-gray-300 bg-gray-50
+            text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2
+            focus:ring-c2/30 focus:border-c2 transition;
+        }
+
+        button.submit-btn {
+            @apply bg-c2 cursor-pointer text-white rounded-md py-2 font-semibold hover:bg-c2/90 transition;
+        }
+
+        div.separator {
+            @apply text-center text-sm text-gray-500;
+        }
+
+        div.social-buttons {
+            @apply flex flex-col gap-3 w-full;
+        }
+
+        button.social-btn {
+            @apply flex items-center gap-3 w-full py-2.5 px-4
+            border border-gray-300 rounded-lg bg-white shadow-sm
+            text-gray-700 font-medium text-sm justify-center
+            hover:border-gray-400 transition cursor-pointer;
+
+            .icon {
+                @apply text-xl;
+            }
+        }
+
+        p.toggle-auth {
+            @apply text-sm text-center text-gray-600;
+        }
+
+        p.toggle-auth a.link {
+            @apply text-c2 font-semibold hover:underline;
+        }
+
+        /* --- Login Modal Only --- */
+        div.modal-options {
+            @apply flex justify-between items-center text-sm;
+        }
+
+        label.remember {
+            @apply flex flex-wrap gap-1 text-gray-700 cursor-pointer;
+
+            input {
+                @apply cursor-pointer inline;
+            }
+        }
+
+        a.forgot-password {
+            @apply text-red-400 hover:underline;
+        }
+
+        /* --- Sign Up Modal Only --- */
+        div.name-fields {
+            @apply flex gap-2;
+        }
+
+        /* --- Password Wrapper --- */
+        .password-wrapper {
+            @apply relative w-full;
+        }
+
+        .eye-btn {
+            @apply absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-lg cursor-pointer;
+        }
+    }
+}

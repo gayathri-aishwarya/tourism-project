@@ -1,0 +1,25 @@
+@import '../../globals.css';
+
+div.bundles-page {
+    @apply max-w-6xl mx-auto;
+
+    section.bundles-section {
+        @apply py-16 px-4;
+    }
+
+    h2.section-title {
+        @apply text-3xl font-semibold text-c3 mb-2;
+    }
+
+    p.section-subtitle {
+        @apply text-sm text-gray-500 mb-8;
+    }
+
+    p.no-bundles {
+        @apply text-center text-gray-500 italic;
+    }
+
+    div.bundles-grid {
+        @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto;
+    }
+}
