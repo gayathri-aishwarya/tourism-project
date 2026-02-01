@@ -1,85 +1,116 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, FormEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import * as Yup from 'yup'
+import '@/src/styles/components/AuthRelated/Modal.css'
 
 export default function ResetPassword() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const emailParam = searchParams.get('email') || ''
 
-    const [email] = useState(emailParam)
+    const [email, setEmail] = useState(emailParam)
     const [newPassword, setNewPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [message, setMessage] = useState('')
     const [loading, setLoading] = useState(false)
+    const [validationErrors, setValidationErrors] = useState<{
+        newPassword?: string
+        confirmPassword?: string
+    }>({})
 
-    const handleResetPassword = async () => {
-        if (!newPassword || !confirmPassword) {
-            setMessage('Please fill in all fields')
-            return
-        }
-        if (newPassword !== confirmPassword) {
-            setMessage('Passwords do not match')
-            return
-        }
+    // Yup schema enforces password rules strictly
+    const schema = Yup.object().shape({
+        newPassword: Yup.string()
+            .required('Password is required')
+            .min(8, 'Password must be at least 8 characters')
+            .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
+            .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
+            .matches(/[0-9]/, 'Password must contain at least one number')
+            .matches(/[@$!%*?&]/, 'Password must contain at least one special character'),
+        confirmPassword: Yup.string()
+            .oneOf([Yup.ref('newPassword')], 'Passwords must match')
+            .required('Please confirm your password'),
+    })
 
-        setLoading(true)
+    const handleResetPassword = async (e: FormEvent) => {
+        e.preventDefault()
         setMessage('')
+        setValidationErrors({})
 
         try {
-            const res = await fetch('http://localhost:3001/api/auth/reset-password', {
+            // Validate before sending
+            await schema.validate({ newPassword, confirmPassword }, { abortEarly: false })
+
+            setLoading(true)
+            const res = await fetch('http://localhost:3001/auth/reset-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, newPassword }),
             })
             const data = await res.json()
+
             if (res.ok) {
-                setMessage('Your password has been reset successfully.')
+                setMessage('Your password has been reset successfully!')
                 setTimeout(() => {
-                    router.push('/') // go back to login page
-                }, 1500)
+                    router.push('/login')
+                }, 1000)
             } else {
                 setMessage(data.message || 'Error resetting password')
             }
-        } catch (err) {
-            console.error(err)
-            setMessage('Error resetting password')
+        } catch (err: any) {
+            if (err.inner) {
+                const errors: Record<string, string> = {}
+                err.inner.forEach((error: any) => {
+                    if (error.path) errors[error.path] = error.message
+                })
+                setValidationErrors(errors)
+            } else {
+                setMessage('Error resetting password')
+            }
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-6 text-center">Reset Password</h2>
+        <div className='modal-overlay'>
+            <form className='modal' onSubmit={handleResetPassword}>
+                <h2 className='modal-title'>Reset Password</h2>
+
+                {message && (
+                    <p className={message.toLowerCase().includes('success') ? 'success-msg' : 'error-msg'}>
+                        {message}
+                    </p>
+                )}
 
                 <input
-                    type="password"
-                    placeholder="New Password"
+                    type='password'
+                    placeholder='New Password'
+                    className='modal-input'
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full p-2 border rounded mb-2"
                 />
+                {validationErrors.newPassword && (
+                    <div className='error-msg'>{validationErrors.newPassword}</div>
+                )}
+
                 <input
-                    type="password"
-                    placeholder="Confirm Password"
+                    type='password'
+                    placeholder='Confirm Password'
+                    className='modal-input'
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full p-2 border rounded mb-2"
                 />
+                {validationErrors.confirmPassword && (
+                    <div className='error-msg'>{validationErrors.confirmPassword}</div>
+                )}
 
-                <button
-                    onClick={handleResetPassword}
-                    disabled={loading}
-                    className="w-full bg-blue-600 text-white p-2 rounded"
-                >
+                <button type='submit' className='submit-btn' disabled={loading}>
                     {loading ? 'Resetting...' : 'Reset Password'}
                 </button>
-
-                {message && <p className="mt-2 text-center text-red-500">{message}</p>}
-            </div>
+            </form>
         </div>
     )
 }

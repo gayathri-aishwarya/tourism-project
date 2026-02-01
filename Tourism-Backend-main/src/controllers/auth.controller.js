@@ -204,7 +204,15 @@ const resetPassword = async (req, res, next) => {
   return res.status(403).json({ message: "OTP verification required." });
  }
 
-    // Update password (authService should hash it if needed)
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.",
+      });
+    }
+
+ // Update password (authService should hash it if needed)
 
     user.password = await bcrypt.hash(newPassword, 12);
     user.isOtpVerified = false;

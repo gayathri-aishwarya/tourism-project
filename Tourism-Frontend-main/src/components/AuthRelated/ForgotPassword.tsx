@@ -1,74 +1,99 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import * as Yup from 'yup'
+import { FiX } from 'react-icons/fi'
+import { useState, FormEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function ForgotPassword() {
+// Types
+import { ModalsProps } from '@/src/types/propsTypes'
+
+// Style
+import '@/src/styles/components/AuthRelated/Modal.css'
+
+export default function ForgotPasswordModal({ onCloseAction }: ModalsProps) {
     const router = useRouter()
     const searchParams = useSearchParams()
+
     const prefillEmail = searchParams.get('email') || ''
 
     const [email, setEmail] = useState(prefillEmail)
-    const [message, setMessage] = useState('')
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
+    const [validationErrors, setValidationErrors] = useState<{ email?: string }>({})
 
-    const handleSendOtp = async () => {
-        if (!email) {
-            setMessage('Please enter your email')
-            return
-        }
+    const schema = Yup.object().shape({
+        email: Yup.string()
+            .email('Invalid email address')
+            .required('Email is required'),
+    })
 
-        setLoading(true)
-        setMessage('')
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault()
+        setError('')
+        setValidationErrors({})
 
         try {
+            await schema.validate({ email }, { abortEarly: false })
+            setLoading(true)
+
             const res = await fetch('http://localhost:3001/api/auth/forgot-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email }),
             })
+
             const data = await res.json()
 
-            if (res.ok) {
-                setMessage('OTP sent! Check your email.')
-                // redirect to verify OTP page after 1 sec
-                setTimeout(() => {
-                    router.push(`/auth/verify-otp?email=${encodeURIComponent(email)}`)
-                }, 1000)
-            } else {
-                setMessage(data.message || 'Error sending OTP')
+            if (!res.ok) {
+                setError(data.message || 'Failed to send OTP')
+                return
             }
-        } catch (err) {
-            console.error(err)
-            setMessage('Error sending OTP')
+
+            setTimeout(() => {
+                router.push(`/auth/verify-otp?email=${encodeURIComponent(email)}`)
+            }, 800)
+        } catch (validationErr: any) {
+            const errors: Record<string, string> = {}
+            validationErr.inner.forEach((err: any) => {
+                if (err.path) errors[err.path] = err.message
+            })
+            setValidationErrors(errors)
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-6 text-center">Forgot Password</h2>
-
-                <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="w-full p-2 border rounded mb-4"
-                />
-
+        <div className='modal-overlay'>
+            <form className='modal' onSubmit={handleSubmit}>
                 <button
-                    onClick={handleSendOtp}
-                    disabled={loading}
-                    className="w-full bg-blue-600 text-white p-2 rounded"
+                    type='button'
+                    className='close-btn'
+                    onClick={onCloseAction}
                 >
-                    {loading ? 'Sending OTP...' : 'Send OTP'}
+                    <FiX />
                 </button>
 
-                {message && <p className="mt-4 text-center text-red-500">{message}</p>}
-            </div>
+                <h2 className='modal-title'>Forgot Password</h2>
+
+                {error && <div className='error-msg'>{error}</div>}
+
+                <input
+                    type='email'
+                    placeholder='Email address'
+                    className='modal-input'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                {validationErrors.email && (
+                    <div className='error-msg'>{validationErrors.email}</div>
+                )}
+
+                <button type='submit' className='submit-btn' disabled={loading}>
+                    {loading ? 'Sending OTP...' : 'SEND OTP'}
+                </button>
+            </form>
         </div>
     )
 }

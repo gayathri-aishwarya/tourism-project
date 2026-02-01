@@ -3,138 +3,156 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
+// Style
+import '@/src/styles/components/AuthRelated/Modal.css'
+
 export default function VerifyOtp() {
-    const router = useRouter()
-    const searchParams = useSearchParams()
-    const emailParam = searchParams.get('email') || ''
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const email = searchParams.get('email') || ''
 
-    const [email, setEmail] = useState(emailParam)
-    const [otp, setOtp] = useState('')
-    const [timerText, setTimerText] = useState('OTP expires in 12:00')
-    const [resendEnabled, setResendEnabled] = useState(false)
-    const [message, setMessage] = useState('')
-    const [resendMessage, setResendMessage] = useState('')
-    const countdown = useRef<NodeJS.Timeout | null>(null)
+  const [otp, setOtp] = useState('')
+  const [message, setMessage] = useState('')
+  const [success, setSuccess] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [resendCount, setResendCount] = useState(0)
+  const [countdown, setCountdown] = useState(0)
+  const timerRef = useRef<number | null>(null)
 
-    const startOtpTimer = (duration = 12 * 60) => {
-        let timer = duration
-        if (countdown.current) clearInterval(countdown.current)
-        countdown.current = setInterval(() => {
-            const minutes = Math.floor(timer / 60)
-            const seconds = timer % 60
-            setTimerText(`OTP expires in ${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`)
+  // Start countdown
+  const startCountdown = () => {
+    setCountdown(60)
+    timerRef.current = window.setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
 
-            if (timer <= 0) {
-                if (countdown.current) clearInterval(countdown.current)
-                setTimerText('OTP expired. Please resend.')
-                setResendEnabled(true)
-            }
+  useEffect(() => {
+    startCountdown()
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
+  }, [])
 
-            timer--
-        }, 1000)
+  const handleVerifyOtp = async () => {
+    if (!otp) {
+      setMessage('Please enter OTP')
+      setSuccess(false)
+      return
     }
 
-    useEffect(() => {
-        startOtpTimer()
-        setResendEnabled(false)
-        return () => { if(countdown.current) clearInterval(countdown.current) }
-    }, [])
+    setLoading(true)
+    setMessage('')
 
-    const handleVerifyOtp = async () => {
-        setMessage('')
-        if (!email || !otp) {
-            setMessage('Please enter email and OTP')
-            return
-        }
+    try {
+      const res = await fetch('http://localhost:3001/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp }),
+      })
+      const data = await res.json()
 
-        try {
-            const res = await fetch('http://localhost:3001/api/auth/verify-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, otp }),
-            })
-            const data = await res.json()
-            if (res.ok) {
-                setMessage('OTP verified successfully.')
-                if (countdown.current) clearInterval(countdown.current)
-                router.push(`/auth/reset-password?email=${encodeURIComponent(email)}`)
-            } else {
-                setMessage(data.message)
-            }
-        } catch (err) {
-            console.error(err)
-            setMessage('Error verifying OTP')
-        }
+      if (res.ok) {
+        setMessage('OTP verified successfully!')
+        setSuccess(true)
+
+        // Redirect to reset password page after short delay
+        setTimeout(() => {
+          router.push(`/auth/reset-password?email=${encodeURIComponent(email)}`)
+        }, 800)
+      } else {
+        setMessage(data.message || 'OTP verification failed')
+        setSuccess(false)
+      }
+    } catch (err) {
+      console.error(err)
+      setMessage('Error verifying OTP')
+      setSuccess(false)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    const handleResendOtp = async () => {
-        setResendMessage('')
-        if (!email) {
-            setResendMessage('Enter your email first!')
-            return
-        }
+  const handleResendOtp = async () => {
+    if (resendCount >= 5) return // silently prevent more than 5 attempts
 
-        try {
-            const res = await fetch('http://localhost:3001/auth/forgot-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
-            })
-            const data = await res.json()
-            if (res.ok) {
-                setResendMessage('OTP resent! Check your email.')
-                startOtpTimer()
-                setResendEnabled(false)
-            } else {
-                setResendMessage(data.message)
-            }
-        } catch (err) {
-            console.error(err)
-            setResendMessage('Error resending OTP')
-        }
+    setLoading(true)
+    setMessage('')
+
+    try {
+      const res = await fetch('http://localhost:3001/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json()
+
+      if (res.ok) {
+        setMessage('OTP resent! Check your email.')
+        setSuccess(true)
+        setResendCount((prev) => prev + 1)
+        startCountdown()
+      } else {
+        setMessage(data.message || 'Error resending OTP')
+        setSuccess(false)
+      }
+    } catch (err) {
+      console.error(err)
+      setMessage('Error resending OTP')
+      setSuccess(false)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-6 text-center">Verify OTP</h2>
+  return (
+    <div className="modal-overlay">
+      <form
+        className="modal"
+        onSubmit={(e) => {
+          e.preventDefault()
+          handleVerifyOtp()
+        }}
+      >
+        <h2 className="modal-title">Verify OTP</h2>
 
-                <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email"
-                    className="w-full p-2 border rounded mb-2"
-                />
+        {message && (
+          <div className={success ? 'success-msg' : 'error-msg'}>{message}</div>
+        )}
 
-                <input
-                    type="text"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    placeholder="Enter OTP"
-                    className="w-full p-2 border rounded mb-2"
-                />
+        <input
+          type="text"
+          placeholder="Enter OTP"
+          className="modal-input"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+        />
 
-                <button
-                    onClick={handleVerifyOtp}
-                    className="w-full bg-blue-600 text-white p-2 rounded mb-2"
-                >
-                    Verify OTP
-                </button>
+        <button type="submit" className="submit-btn" disabled={loading}>
+          {loading ? 'Verifying...' : 'Verify OTP'}
+        </button>
 
-                <p className="text-center text-gray-600">{timerText}</p>
-
-                <button
-                    onClick={handleResendOtp}
-                    disabled={!resendEnabled}
-                    className={`w-full mt-2 p-2 rounded text-white ${resendEnabled ? 'bg-green-600' : 'bg-gray-400 cursor-not-allowed'}`}
-                >
-                    Resend OTP
-                </button>
-
-                {message && <p className="mt-2 text-center text-red-500">{message}</p>}
-                {resendMessage && <p className="mt-1 text-center text-red-500">{resendMessage}</p>}
-            </div>
+        <div className="modal-options">
+          <button
+            type="button"
+            className="forgot-password"
+            onClick={handleResendOtp}
+            disabled={countdown > 0}
+            style={{
+              color: countdown > 0 ? 'gray' : 'orange',
+              cursor: countdown > 0 ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {countdown > 0 ? `Resend OTP in ${countdown}s` : 'Resend OTP'}
+          </button>
         </div>
-    )
+      </form>
+    </div>
+  )
 }
