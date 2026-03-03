@@ -2,13 +2,21 @@ import { FaStar } from 'react-icons/fa'
 // Types
 import { SeatType, BusSeatsLayout } from '@/src/types/objectsTypes'
 
-export const capitalizeWords = (text: string) => {
+/**
+ * Capitalizes the first letter of each word in a string
+ */
+export const capitalizeWords = (text?: string) => {
+    if (!text) return ''
     return text
+        .trim()
         .split(' ')
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
 }
 
+/**
+ * Renders full, half, and empty stars based on rating (out of 5)
+ */
 export const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating)
     const hasHalfStar = rating % 1 >= 0.5
@@ -28,9 +36,7 @@ export const renderStars = (rating: number) => {
                     key='half'
                     className='relative inline-block align-middle mr-1 text-[1rem] leading-none'
                 >
-                    {/* base (empty) */}
                     <FaStar className='text-gray-300' />
-                    {/* filled half */}
                     <span className='absolute inset-0 w-1/2 overflow-hidden'>
                         <FaStar className='text-c2' />
                     </span>
@@ -47,36 +53,18 @@ export const renderStars = (rating: number) => {
     )
 }
 
+/**
+ * Converts a BusSeatsLayout object into a compact string for DB storage
+ */
 export const seatsObjectToString = (layout: BusSeatsLayout): string => {
-    /**
-     * Imagine you are describing the bus seats as a simple text message.
-     *
-     * Each row of the bus is written separately, with rows divided by a "|" symbol.
-     * Inside each row, the seats on the left, middle, and right are separated by ";".
-     * Each seat is written as "number:status".
-     *   - number = the seat number (like 1, 2, 3…)
-     *   - status = 0 if free, 1 if booked
-     *
-     * Example:
-     *   Row 1 has seats 1 (free) and 2 (booked) on the left,
-     *   and seat 11 (free) on the right.
-     *   That row looks like: "1:0,2:1;11:0"
-     *
-     * If we have two rows, we join them with "|":
-     *   "1:0,2:1;11:0 | 3:0,4:0;12:1"
-     *
-     * This makes the bus layout into a single string you can store in a database.
-     */
+    if (!layout?.rows || !layout.rows.length) return ''
 
     return layout.rows
         .map((row) => {
             const sideToString = (side?: SeatType[]) =>
                 side
                     ? side
-                          .map(
-                              (seat) =>
-                                  `${seat.number}:${seat.isBooked ? 1 : 0}`
-                          )
+                          .map((seat) => `${seat.number}:${seat.isBooked ? 1 : 0}`)
                           .join(',')
                     : ''
 
@@ -85,30 +73,17 @@ export const seatsObjectToString = (layout: BusSeatsLayout): string => {
                 sideToString(row.middle),
                 sideToString(row.right),
             ].filter(Boolean)
+
             return parts.join(';')
         })
         .join(' | ')
 }
 
+/**
+ * Converts a compact bus seats string from the DB back into a BusSeatsLayout object
+ */
 export const seatsStringToObject = (str: string): BusSeatsLayout => {
-    /**
-     * This takes the short text version of seats and turns it back into a bus layout object.
-     *
-     * We read each row by splitting at the "|" symbol.
-     * Then inside each row, we split the left, middle, and right sides by ";".
-     * Each seat is split into two parts: "number:status".
-     *   - number = seat number
-     *   - status = 0 (free) or 1 (booked)
-     *
-     * Example string:
-     *   "1:0,2:1;11:0 | 3:0,4:0;12:1"
-     *
-     * Becomes an object with two rows:
-     *   Row 1 → left seats [1 free, 2 booked], right seat [11 free]
-     *   Row 2 → left seats [3 free, 4 free], right seat [12 booked]
-     *
-     * This way, we can rebuild the detailed seat layout for rendering in the UI.
-     */
+    if (!str || !str.trim()) return { rows: [] }
 
     const rows = str.split('|').map((rowStr, rowIndex) => {
         const sides = rowStr.trim().split(';')
@@ -135,23 +110,35 @@ export const seatsStringToObject = (str: string): BusSeatsLayout => {
     return { rows }
 }
 
+/**
+ * Calculates total, booked, and available seats from a BusSeatsLayout object
+ */
 export const busSeatsStats = (layout: BusSeatsLayout) => {
     let total = 0
     let booked = 0
-    layout.rows.forEach((row) => {
-        ;(['left', 'middle', 'right'] as const).forEach((side) => {
+
+    if (!layout?.rows || !Array.isArray(layout.rows)) {
+        return { total: 0, booked: 0, available: 0 }
+    }
+
+    for (const row of layout.rows) {
+        for (const side of ['left', 'middle', 'right'] as const) {
             const seats = row[side]
-            if (seats) {
-                seats.forEach((seat) => {
+            if (Array.isArray(seats)) {
+                for (const seat of seats) {
                     total++
                     if (seat.isBooked) booked++
-                })
+                }
             }
-        })
-    })
+        }
+    }
+
     return { total, booked, available: total - booked }
 }
 
+/**
+ * Calculates the duration between departure and arrival as a readable string
+ */
 export const getDuration = (arrival: Date, departure: Date) => {
     const diffMs = new Date(arrival).getTime() - new Date(departure).getTime()
     const hours = Math.floor(diffMs / (1000 * 60 * 60))

@@ -34,10 +34,7 @@ export type ProductObject = {
     description: string
     location_id: string
     is_active: boolean
-    details: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        [key: string]: any
-    }
+    details: { [key: string]: any } // keep flexible
     createdAt?: string
     updatedAt?: string
     __v?: number
@@ -102,7 +99,6 @@ export type BookingObject = {
     __v?: number
 }
 
-// Specific product types
 export type BusObject = Omit<ProductObject, 'type' | 'details'> & {
     type: 'bus'
     details: {
@@ -204,4 +200,17 @@ export type ReviewType = {
     name: string
     rating: number
     text: string
+}
+
+
+export type TripInstance = {
+    _id: string
+    bus_id: string
+    trip_template_id: string
+    trip_template?: BusObject 
+    travel_date: Date
+    booked_seats: string[]; 
+    all_seats: string[]
+    createdAt?: string
+    updatedAt?: string
 }

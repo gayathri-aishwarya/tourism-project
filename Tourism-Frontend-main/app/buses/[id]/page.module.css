@@ -1,0 +1,120 @@
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  gap: 1rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  font-size: 3rem;
+  color: white;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.loadingContainer p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.debug {
+  font-size: 0.85rem;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  max-width: 600px;
+  overflow: auto;
+  text-align: left;
+  font-family: monospace;
+  white-space: pre-wrap;
+  margin-top: 1rem;
+}
+
+.errorContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  color: white;
+}
+
+.errorContainer h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.errorContainer p {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+  max-width: 500px;
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.backButton svg {
+  font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .errorContainer h2 {
+    font-size: 1.5rem;
+  }
+
+  .errorContainer p {
+    font-size: 1rem;
+  }
+
+  .backButton {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .spinner {
+    font-size: 2.5rem;
+  }
+
+  .debug {
+    font-size: 0.75rem;
+    padding: 0.75rem;
+  }
+}

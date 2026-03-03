@@ -1,0 +1,865 @@
+.container {
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Header */
+.header {
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  margin-bottom: 1rem;
+}
+
+.backBtn:hover {
+  background: #f8fafc;
+  color: #10b981;
+  border-color: #10b981;
+}
+
+.tripSummary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.route {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.routeIcon {
+  color: #f97316;
+}
+
+.routeArrow {
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+.tripDetails {
+  display: flex;
+  gap: 1.5rem;
+  color: #64748b;
+  font-size: 0.95rem;
+  flex-wrap: wrap;
+}
+
+.tripDetails span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tripDetails svg {
+  color: #10b981;
+}
+
+/* Main Content */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Seat Layout Section */
+.seatLayoutSection {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.seatLayoutSection h2 {
+  font-size: 1.5rem;
+  color: #0f172a;
+  margin-bottom: 1.5rem;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.legendIcon {
+  font-size: 1.1rem;
+}
+
+/* Bus Layout */
+.busLayout {
+  background: #f1f5f9;
+  border-radius: 2rem;
+  padding: 2rem;
+  border: 2px solid #cbd5e1;
+  position: relative;
+}
+
+.busFront {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  background: #cbd5e1;
+  border-radius: 2rem;
+  font-size: 0.9rem;
+  color: #475569;
+  width: fit-content;
+  margin: 0 auto 2rem;
+  font-weight: 500;
+}
+
+.driverIcon {
+  color: #8b5cf6;
+  font-size: 1.2rem;
+}
+
+.busRear {
+  text-align: center;
+  padding: 0.5rem 1.5rem;
+  background: #cbd5e1;
+  border-radius: 2rem;
+  font-size: 0.9rem;
+  color: #475569;
+  width: fit-content;
+  margin: 2rem auto 0;
+  font-weight: 500;
+}
+
+/* Seat Container */
+.seatsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.seatRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rowLabel {
+  width: 30px;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.leftSide, .rightSide {
+  display: flex;
+  gap: 0.75rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.aisle {
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(255,255,255,0.5);
+  height: 60px;
+  border-radius: 20px;
+}
+
+/* Seat Button - Bus seat shaped */
+.seat {
+  width: 60px;
+  height: 60px;
+  border: none;
+  border-radius: 12px 12px 4px 4px; /* Rounded top, flat bottom - like a bus seat */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  font-weight: 500;
+  position: relative;
+}
+
+/* Add a slight curve at the bottom for seat shape */
+.seat::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 10%;
+  width: 80%;
+  height: 3px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 50%;
+}
+
+.seat.regular {
+  background: #10b981; /* Green for available */
+}
+
+.seat.driver {
+  background: #8b5cf6; /* Purple for driver */
+}
+
+.seat.wc {
+  background: #6b7280; /* Gray for WC */
+}
+
+.seat.regular.booked {
+  background: #ef4444; /* Red for booked */
+}
+
+.seat.regular.selected {
+  background: #f97316; /* Orange for selected */
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
+}
+
+.seat:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+}
+
+.seat:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.seatNumber {
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: rgba(0,0,0,0.2);
+  padding: 0.1rem 0.3rem;
+  border-radius: 10px;
+  margin-top: 0.1rem;
+}
+
+.seatIcon {
+  font-size: 1.4rem;
+}
+
+/* Booking Flow */
+.bookingFlow {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.selectionCard, .detailsCard, .paymentCard, .tripCard {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.selectionCard h3, .detailsCard h3, .paymentCard h3, .tripCard h4 {
+  font-size: 1.1rem;
+  color: #0f172a;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* Selected Seats */
+.selectedSeatsList {
+  margin-bottom: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.selectedSeatRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s;
+}
+
+.selectedSeatRow:hover {
+  background: #f1f5f9;
+  transform: translateX(4px);
+}
+
+.seatInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.seatInfo svg {
+  font-size: 1rem;
+  color: #f97316;
+}
+
+.selectedSeatRow .seatPrice {
+  color: #f97316;
+  font-weight: 600;
+}
+
+/* Total Price */
+.totalPrice {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-top: 2px solid #e2e8f0;
+  border-bottom: 2px solid #e2e8f0;
+  margin: 1rem 0;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.priceAmount {
+  font-size: 1.5rem;
+  color: #10b981;
+  font-weight: 700;
+}
+
+/* Passenger Form */
+.passengerForm {
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.passengerForm h4 {
+  font-size: 0.95rem;
+  color: #0f172a;
+  margin-bottom: 1rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.formGroup {
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: #10b981;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+/* Contact Section */
+.contactSection {
+  margin: 1.5rem 0;
+  padding-top: 1rem;
+  border-top: 2px solid #e2e8f0;
+}
+
+.contactSection h4 {
+  font-size: 1rem;
+  color: #0f172a;
+  margin-bottom: 1rem;
+}
+
+/* Buttons */
+.buttonGroup {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.proceedBtn {
+  flex: 1;
+  padding: 0.75rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.proceedBtn:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(16,185,129,0.3);
+}
+
+.proceedBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.payBtn {
+  flex: 1;
+  padding: 0.75rem;
+  background: #f97316;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.payBtn:hover {
+  background: #ea580c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(249,115,22,0.3);
+}
+
+.backBtn {
+  flex: 1;
+  padding: 0.75rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.backBtn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+/* No Selection */
+.noSelection {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.cartIcon {
+  font-size: 3rem;
+  color: #94a3b8;
+  margin-bottom: 1rem;
+}
+
+.noSelection p {
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Payment Section */
+.paymentSummary {
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.paymentSummary h4 {
+  font-size: 0.95rem;
+  color: #0f172a;
+  margin-bottom: 1rem;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.summaryRow svg {
+  margin-right: 0.25rem;
+  color: #f97316;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0 0;
+  margin-top: 0.5rem;
+  border-top: 2px solid #e2e8f0;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.paymentMethods {
+  margin-bottom: 1.5rem;
+}
+
+.paymentMethods h4 {
+  font-size: 0.95rem;
+  color: #0f172a;
+  margin-bottom: 1rem;
+}
+
+.paymentOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.paymentOption:hover {
+  background: #f1f5f9;
+}
+
+.paymentOption input {
+  width: auto;
+  margin-right: 0.5rem;
+}
+
+.paymentOption svg {
+  color: #10b981;
+  font-size: 1.2rem;
+}
+
+/* Trip Card */
+.tripCard {
+  background: linear-gradient(145deg, #f8fafc, #ffffff);
+}
+
+.tripDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tripDetails p {
+  display: flex;
+  justify-content: space-between;
+  color: #64748b;
+  font-size: 0.9rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.tripDetails p:last-child {
+  border-bottom: none;
+}
+
+.tripDetails p strong {
+  color: #0f172a;
+}
+
+/* Loading States */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+}
+
+.loadingSpinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #10b981;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error States */
+.errorContainer {
+  text-align: center;
+  padding: 4rem 2rem;
+  max-width: 500px;
+  margin: 4rem auto;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.errorContainer h2 {
+  font-size: 1.5rem;
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+
+.errorContainer p {
+  color: #64748b;
+  margin-bottom: 2rem;
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.backButton:hover {
+  background: #059669;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .bookingFlow {
+    order: -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+  }
+
+  .tripSummary {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tripDetails {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .seat {
+    width: 50px;
+    height: 50px;
+  }
+
+  .seatIcon {
+    font-size: 1.2rem;
+  }
+
+  .leftSide, .rightSide {
+    gap: 0.5rem;
+  }
+
+  .aisle {
+    width: 30px;
+    height: 50px;
+  }
+
+  .rowLabel {
+    width: 25px;
+    font-size: 0.8rem;
+  }
+
+  .legend {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .seat {
+    width: 45px;
+    height: 45px;
+  }
+
+  .leftSide, .rightSide {
+    gap: 0.25rem;
+  }
+
+  .aisle {
+    width: 20px;
+  }
+}
+/* Pricing Info */
+.pricingInfo {
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
+  border: 1px solid #e2e8f0;
+}
+
+.priceBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.priceBadge strong {
+  color: #10b981;
+  font-size: 1rem;
+}
+
+.priceNote {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  margin-left: auto;
+}
+
+.priceNote svg {
+  font-size: 0.9rem;
+}
+
+/* Validation Error */
+.validationError {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.validationError svg {
+  color: #ef4444;
+}
+
+/* Passenger Form Updates */
+.passengerForm h4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  color: #0f172a;
+  margin-bottom: 1rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.passengerPrice {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 1rem;
+}
+
+.ageDiscount {
+  display: block;
+  color: #10b981;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.phoneHint {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.7rem;
+  margin-top: 0.25rem;
+}
+
+/* Summary Row Updates */
+.summaryRow small {
+  color: #10b981;
+  font-size: 0.7rem;
+  font-style: italic;
+}
+
+/* Trip Card Updates */
+.tripCard p small {
+  display: block;
+  color: #f97316;
+  font-size: 0.7rem;
+  margin-top: 0.25rem;
+  font-style: italic;
+}

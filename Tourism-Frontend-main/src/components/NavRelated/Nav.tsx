@@ -1,3 +1,4 @@
+// src/components/NavRelated/Nav.tsx
 'use client'
 
 import Link from 'next/link'
@@ -10,6 +11,7 @@ import {
     FaInfoCircle,
     FaBoxOpen,
     FaMapMarkerAlt,
+    FaBus,
     FaSignOutAlt,
 } from 'react-icons/fa'
 // Contexts
@@ -18,6 +20,7 @@ import { AreAuthModalsOpenContext, UserContext } from '@/src/contexts/Contexts'
 import Container from '@/src/components/ContainerRelated/Container'
 import LoginModal from '@/src/components/AuthRelated/LoginModal'
 import SignUpModal from '@/src/components/AuthRelated/SignupModal'
+
 // Functions
 import { capitalizeWords } from '@/src/utils/Functions'
 // Style
@@ -34,7 +37,7 @@ export default function Nav() {
     const [isLoginOpen, setIsLoginOpen] = isLoginModalOpenState
     const [isSignUpOpen, setIsSignUpOpen] = isSignUpModalOpenState
 
-    // Static data for nav
+    // Static data for nav - ADDED BUSES LINK HERE
     const navData = {
         logo: {
             homeHref: '/',
@@ -50,11 +53,8 @@ export default function Nav() {
             { href: '/', label: 'Home', icon: <FaHome /> },
             { href: '/about', label: 'About', icon: <FaInfoCircle /> },
             { href: '/bundles', label: 'Bundles', icon: <FaBoxOpen /> },
-            {
-                href: '/locations',
-                label: 'Locations',
-                icon: <FaMapMarkerAlt />,
-            },
+            { href: '/locations', label: 'Locations', icon: <FaMapMarkerAlt /> },
+            { href: '/buses', label: 'Buses', icon: <FaBus /> }, // ADDED THIS LINE
         ],
     }
 

@@ -1,0 +1,71 @@
+.bus-details-page {
+  @apply max-w-6xl mx-auto px-4 py-8;
+}
+
+.back-btn {
+  @apply mb-6 text-blue-600 hover:text-blue-800 flex items-center gap-2;
+}
+
+.trip-summary {
+  @apply bg-white rounded-lg shadow-md p-6 mb-8;
+}
+
+.trip-summary h1 {
+  @apply text-2xl font-bold mb-2;
+}
+
+.trip-meta {
+  @apply flex flex-wrap gap-4 text-gray-600;
+}
+
+.main-content {
+  @apply grid grid-cols-1 lg:grid-cols-3 gap-8;
+}
+
+.seats-section {
+  @apply lg:col-span-2 bg-white rounded-lg shadow-md p-6;
+}
+
+.seats-section h2 {
+  @apply text-xl font-semibold mb-4;
+}
+
+.seats-available {
+  @apply text-gray-600 mb-4;
+}
+
+.sidebar {
+  @apply lg:col-span-1;
+}
+
+.summary-card {
+  @apply bg-white rounded-lg shadow-md p-6 sticky top-24;
+}
+
+.summary-card h3 {
+  @apply text-lg font-semibold mb-4;
+}
+
+.summary-row {
+  @apply flex justify-between mb-2 text-gray-600;
+}
+
+.summary-row.total {
+  @apply mt-4 pt-4 border-t text-lg font-bold text-gray-900;
+}
+
+.total-amount {
+  @apply text-blue-600;
+}
+
+.proceed-btn {
+  @apply w-full mt-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.policy {
+  @apply mt-6 text-sm text-gray-500;
+}
+
+.policy .icon {
+  @apply inline mr-2;
+}

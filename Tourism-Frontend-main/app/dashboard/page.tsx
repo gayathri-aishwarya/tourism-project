@@ -11,6 +11,7 @@ import BundlesTab from '@/src/components/DashboardRelated/BundlesTab'
 import EmployeesTab from '@/src/components/DashboardRelated/EmployeesTab'
 import LocationsTab from '@/src/components/DashboardRelated/LocationsTab'
 import ProductsTab from '@/src/components/DashboardRelated/ProductsTab'
+import BusesTab from '@/src/components/DashboardRelated/BusesTab' 
 // Types
 import { HolidayObject } from '@/src/types/objectsTypes'
 // Style
@@ -23,6 +24,7 @@ const TABS = [
     { key: 'locations', label: 'Location Management', permission: 'locations' },
     { key: 'products', label: 'Product Management', permission: 'products' },
     { key: 'bundles', label: 'Bundle Management', permission: 'bundles' },
+    { key: 'buses', label: 'Bus Management', permission: 'buses' }, 
 ]
 
 export default function Page() {
@@ -115,15 +117,21 @@ export default function Page() {
                 </div>
             </section>
 
-
             <hr className="dashboard-separator"/>
+
+            {/* Dashboard Stats Section - NEW */}
+            {currentTab === 'bookings' && (
+                <>
+                    {/* Quick Stats for Bookings - You can add stats here if needed */}
+                </>
+            )}
 
             {/* Dashboard Tabs */}
             <section className='tabs-section'>
                 <h2 className='tabs-title'>Dashboard</h2>
                 <p className='tabs-subtitle'>
                     Manage and monitor all branches, employees, locations,
-                    products, bundles, and upcoming holidays in one place.
+                    products, bundles, buses, and upcoming holidays in one place.
                 </p>
 
                 <div className='tabs-header'>
@@ -145,6 +153,7 @@ export default function Page() {
                     {currentTab === 'locations' && <LocationsTab/>}
                     {currentTab === 'products' && <ProductsTab/>}
                     {currentTab === 'bundles' && <BundlesTab/>}
+                    {currentTab === 'buses' && <BusesTab/>} {/* ✅ NEW TAB CONTENT */}
                 </div>
             </section>
         </div>

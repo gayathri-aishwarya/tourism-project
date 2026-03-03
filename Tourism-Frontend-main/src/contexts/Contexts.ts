@@ -4,10 +4,18 @@
 import { createContext } from 'react'
 // Types
 import {
-    AdminContextType,
+   
     AreAuthModalsOpenContextType,
     UserContextType,
 } from '../types/contextsTypes'
+
+// src/types/contextsTypes.ts
+
+export interface AdminContextType {
+    // ... existing properties
+    getBuses: () => Promise<any[]>; 
+    // ... other admin functions
+}
 
 export const AreAuthModalsOpenContext =
     createContext<AreAuthModalsOpenContextType>(

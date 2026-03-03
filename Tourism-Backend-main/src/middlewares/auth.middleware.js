@@ -1,37 +1,45 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-// Middleware to verify the JWT token and attach user to the request
 exports.protect = async (req, res, next) => {
   let token;
 
-  // Check if the token is in the Authorization header
   if (
     req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
+    req.headers.authorization.startsWith("Bearer ")
   ) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      req.user = await User.findById(decoded.userId).select("-password");
-
-      if (!req.user) {
-        return res
-          .status(401)
-          .json({ message: "No user found with this token" });
-      }
-
-      next();
-    } catch (error) {
-      return res.status(401).json({ message: "Not authorized, token failed" });
-    }
+    token = req.headers.authorization.split(" ")[1];
   }
 
   if (!token) {
     return res.status(401).json({ message: "Not authorized, no token" });
   }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const userId =
+      decoded.userId ||
+      decoded.id ||
+      decoded._id ||
+      (decoded.user && decoded.user.id);
+
+    if (!userId) {
+      return res.status(401).json({ message: "Invalid token payload" });
+    }
+
+    req.user = await User.findById(userId).select("-password");
+
+    if (!req.user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: "Not authorized, token failed" });
+  }
 };
+
 
 // Middleware to check if the user has the 'master_admin' role
 exports.isMasterAdmin = (req, res, next) => {

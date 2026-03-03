@@ -1,277 +1,121 @@
 'use client'
 
-import dayjs from 'dayjs'
-import {
-    FaClock,
-    FaDollarSign,
-    FaWifi,
-    FaBusAlt,
-    FaMapPin,
-} from 'react-icons/fa'
-import { MdLocationOn } from 'react-icons/md'
-import { use, useCallback, useContext, useEffect, useState } from 'react'
-// Components
-import BusSeats from '@/src/components/OtherRelated/BusSeats'
-import BookingModal from '@/src/components/BookingRelated/BookingModal'
-// Contexts
-import {
-    AdminContext,
-    AreAuthModalsOpenContext,
-    UserContext,
-} from '@/src/contexts/Contexts'
-// Functions
-import { seatsStringToObject } from '@/src/utils/Functions'
-// Types
-import {
-    BusObject,
-    BusSeatsLayout,
-    LocationObject,
-} from '@/src/types/objectsTypes'
-import { BusPageParamsType } from '@/src/types/propsTypes'
-// Style
-import '@/src/styles/pages/buses/[id]/page.css'
+import { useEffect, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { FaSpinner, FaArrowLeft } from 'react-icons/fa'
+import { adminBusApi } from '@/src/api/admin-bus.api'
+import styles from './page.module.css'
 
-export default function Page({ params }: BusPageParamsType) {
-    // Get ID /buses/:id
-    const { id } = use(params)
-    // Contexts Functions
-    const { isLoggedIn } = useContext(UserContext)
-    const { getProductById, getLocationById, createBooking } =
-        useContext(AdminContext)
-    const { isLoginModalOpenState } = useContext(AreAuthModalsOpenContext)
-    // States
-    const [product, setProduct] = useState<BusObject>()
-    const [location, setLocation] = useState<LocationObject>()
-    const [busSeats, setBusSeats] = useState<BusSeatsLayout>({
-        rows: [
-            {
-                left: [],
-                right: [],
-            },
-        ],
-    })
-    const [isBookingOpen, setIsBookingOpen] = useState(false)
-    const [selectedSeats, setSelectedSeats] = useState<number[]>([])
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_, setIsLoginOpen] = isLoginModalOpenState
+export default function BusDetailsPage() {
+    const params = useParams()
+    const router = useRouter()
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+    const [debug, setDebug] = useState<string>('')
 
-    const fetchProduct = useCallback(async () => {
-        const data = await getProductById(id)
-        setProduct(data as BusObject)
-    }, [getProductById, id])
+    useEffect(() => {
+        const checkAndRedirect = async () => {
+            try {
+                const id = params?.id as string
+                
+                if (!id) {
+                    setError('Invalid bus ID')
+                    setLoading(false)
+                    return
+                }
 
-    const fetchLocation = useCallback(async () => {
-        if (product) {
-            const data = await getLocationById(product.location_id)
-            setLocation(data)
+                console.log('Checking ID:', id)
+                setDebug(`Checking ID: ${id}`)
+
+                // First, let's check if this is a valid trip instance
+                try {
+                    console.log('Attempting to fetch trip instance...')
+                    const tripResponse = await adminBusApi.getTripInstance(id)
+                    console.log('Trip response:', tripResponse)
+                    
+                    if (tripResponse && tripResponse.instance) {
+                        console.log('Found trip instance, redirecting to seat selection')
+                        // It's a trip instance, redirect to seat selection
+                        router.replace(`/buses/select-seat/${id}`)
+                        return
+                    }
+                } catch (tripError: any) {
+                    console.log('Trip instance fetch failed:', tripError.message)
+                    setDebug(prev => prev + '\nTrip fetch failed: ' + tripError.message)
+                    
+                    // Check if it's a 404 or other error
+                    if (tripError.response?.status === 404) {
+                        console.log('Trip instance not found (404)')
+                    } else {
+                        console.log('Other error fetching trip:', tripError)
+                    }
+                }
+
+                // If not a trip instance, check if it's a bus
+                try {
+                    console.log('Attempting to fetch buses...')
+                    const busesResponse = await adminBusApi.getBuses()
+                    console.log('Buses response received')
+                    
+                    if (busesResponse && busesResponse.buses) {
+                        const bus = busesResponse.buses.find((b: any) => b._id === id)
+                        
+                        if (bus) {
+                            console.log('Found bus:', bus.vehicle_no)
+                            setDebug(prev => prev + '\nFound bus: ' + bus.vehicle_no)
+                            
+                            // It's a bus, check if it has a seat layout
+                            if (bus.seat_layout && bus.seat_layout.length > 0) {
+                                // Redirect to a bus info page or show bus details
+                                // For now, redirect to buses listing
+                                router.replace('/buses')
+                                return
+                            }
+                        }
+                    }
+                    
+                    console.log('No bus found with ID:', id)
+                    setDebug(prev => prev + '\nNo bus found with this ID')
+                } catch (busError: any) {
+                    console.error('Error fetching buses:', busError)
+                    setDebug(prev => prev + '\nBus fetch error: ' + busError.message)
+                }
+
+                // If we get here, neither trip nor bus was found
+                setError('Bus or trip not found. Please check the URL and try again.')
+                setLoading(false)
+            } catch (err: any) {
+                console.error('Error in redirect:', err)
+                setError('An error occurred: ' + err.message)
+                setLoading(false)
+            }
         }
-    }, [getLocationById, product])
 
-    useEffect(() => {
-        fetchProduct().then()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+        checkAndRedirect()
+    }, [params, router])
 
-    useEffect(() => {
-        fetchLocation().then()
-        if (product) setBusSeats(seatsStringToObject(product.details.bus_seats))
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [product])
-
-    // Destructure for readability
-    if (!product) {
-        return <div className='p-6'>Loading...</div>
+    if (loading) {
+        return (
+            <div className={styles.loadingContainer}>
+                <FaSpinner className={styles.spinner} />
+                <p>Loading...</p>
+                <p className={styles.debug}>{debug}</p>
+            </div>
+        )
     }
 
-    const { details } = product
+    if (error) {
+        return (
+            <div className={styles.errorContainer}>
+                <h2>Error</h2>
+                <p>{error}</p>
+                <p className={styles.debug}>Debug info: {debug}</p>
+                <button onClick={() => router.push('/buses')} className={styles.backButton}>
+                    <FaArrowLeft /> Back to Buses
+                </button>
+            </div>
+        )
+    }
 
-    return (
-        <div className='bus-page'>
-            {/* Hero Section */}
-            <section
-                className='bus-hero'
-                style={
-                    details.img
-                        ? { backgroundImage: `url(${details.img})` }
-                        : {}
-                }
-            >
-                <div className='overlay' />
-                <div className='bus-hero-content'>
-                    <div>
-                        <h1 className='bus-title'>{product.name}</h1>
-                        {location && (
-                            <p className='bus-location'>
-                                <FaMapPin className='location-icon' />
-                                {location.name}
-                            </p>
-                        )}
-                    </div>
-
-                    {!product.is_active ? (
-                        <p className='inactive-label'>
-                            This {product.type.trim()} is currently inactive.
-                        </p>
-                    ) : isLoggedIn() ? (
-                        <button
-                            className='book-btn'
-                            onClick={() => setIsBookingOpen(true)}
-                        >
-                            Book Now
-                        </button>
-                    ) : (
-                        <p className='not-logged-in'>
-                            <span onClick={() => setIsLoginOpen(true)}>
-                                Login
-                            </span>{' '}
-                            to book this {product.type.trim()}.
-                        </p>
-                    )}
-                </div>
-            </section>
-
-            {/* Info Section */}
-            <section className='bus-info'>
-                {details.from_location && (
-                    <div className='info-item'>
-                        <MdLocationOn className='info-icon' />
-                        <span className='info-text'>
-                            From <strong>{details.from_location}</strong>
-                        </span>
-                    </div>
-                )}
-                {details.to_location && (
-                    <div className='info-item'>
-                        <MdLocationOn className='info-icon' />
-                        <span className='info-text'>
-                            To <strong>{details.to_location}</strong>
-                        </span>
-                    </div>
-                )}
-                {details.departure_time && (
-                    <div className='info-item'>
-                        <FaClock className='info-icon' />
-                        <span className='info-text'>
-                            Departs{' '}
-                            <strong>
-                                {dayjs(details.departure_time).format(
-                                    new Date(
-                                        details.departure_time
-                                    ).getFullYear() === new Date().getFullYear()
-                                        ? 'DD MMM hh:mm A'
-                                        : 'DD MMM YYYY hh:mm A'
-                                )}
-                            </strong>
-                        </span>
-                    </div>
-                )}
-                {details.arrival_time && (
-                    <div className='info-item'>
-                        <FaClock className='info-icon' />
-                        <span className='info-text'>
-                            Arrives{' '}
-                            <strong>
-                                {dayjs(details.arrival_time).format(
-                                    new Date(
-                                        details.arrival_time
-                                    ).getFullYear() === new Date().getFullYear()
-                                        ? 'DD MMM hh:mm A'
-                                        : 'DD MMM YYYY hh:mm A'
-                                )}
-                            </strong>
-                        </span>
-                    </div>
-                )}
-                {details.bus_model && (
-                    <div className='info-item'>
-                        <FaBusAlt className='info-icon' />
-                        <span className='info-text'>
-                            Model <strong>{details.bus_model}</strong>
-                        </span>
-                    </div>
-                )}
-                {details.wifi_available !== undefined && (
-                    <div className='info-item'>
-                        <FaWifi className='info-icon' />
-                        <span className='info-text'>
-                            <strong>
-                                {details.wifi_available
-                                    ? 'Wi-Fi Available'
-                                    : 'No Wi-Fi'}
-                            </strong>
-                        </span>
-                    </div>
-                )}
-                {details.price_per_seat && (
-                    <div className='info-item'>
-                        <FaDollarSign className='info-icon' />
-                        <span className='info-text'>
-                            <strong>{details.price_per_seat} EGP</strong> / Seat
-                        </span>
-                    </div>
-                )}
-            </section>
-
-            {/* Details Section */}
-            {(product.description ||
-                details.available_times ||
-                details.bus_seats) && (
-                <section className='bus-details'>
-                    {product.description && (
-                        <div className='detail-group'>
-                            <h2 className='section-title'>About</h2>
-                            <p className='desc-text'>{product.description}</p>
-                        </div>
-                    )}
-                    {details.available_times && (
-                        <div className='detail-group'>
-                            <h2 className='section-title'>Available Times</h2>
-                            <ul>
-                                {details.available_times.map((time, index) => (
-                                    <li key={index}>
-                                        <FaClock className='info-icon' />
-                                        <p className='desc-text'>
-                                            {new Date().getFullYear() ===
-                                            new Date(time).getFullYear()
-                                                ? dayjs(time).format(
-                                                      'hh:mm A, DD MMM'
-                                                  )
-                                                : dayjs(time).format(
-                                                      'hh:mm A, DD MMM YYYY'
-                                                  )}
-                                        </p>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
-                    {details.bus_seats && (
-                        <div className='detail-group'>
-                            <h2 className='section-title'>Seats</h2>
-                            <BusSeats
-                                layout={busSeats}
-                                onSelect={setSelectedSeats}
-                                selectedSeats={selectedSeats}
-                            />
-                        </div>
-                    )}
-                </section>
-            )}
-
-            {/* Booking Modal */}
-            {isBookingOpen && (
-                <BookingModal
-                    type={product.type}
-                    productId={product._id}
-                    onCloseAction={() => setIsBookingOpen(false)}
-                    busSeats={selectedSeats}
-                    onConfirmAction={async (data) => {
-                        await createBooking(data)
-                        await fetchProduct()
-                        setSelectedSeats([])
-                    }}
-                />
-            )}
-        </div>
-    )
+    return null
 }

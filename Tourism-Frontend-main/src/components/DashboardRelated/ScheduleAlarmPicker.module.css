@@ -1,0 +1,174 @@
+.container {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid var(--gray-200);
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 1rem;
+}
+
+.icon {
+  color: #10b981;
+}
+
+.typeGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.typeButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border: 2px solid var(--gray-200);
+  border-radius: 0.75rem;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  gap: 0.25rem;
+}
+
+.typeButton svg {
+  font-size: 1.25rem;
+  color: var(--gray-600);
+}
+
+.typeButton span {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--gray-800);
+}
+
+.typeButton small {
+  font-size: 0.7rem;
+  color: var(--gray-500);
+}
+
+.typeButton:hover {
+  border-color: #10b981;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.typeButton.active {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.typeButton.active svg {
+  color: #10b981;
+}
+
+.weeklySection,
+.monthlySection {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--gray-50);
+  border-radius: 0.75rem;
+}
+
+.weeklySection label,
+.monthlySection label {
+  display: block;
+  font-weight: 500;
+  color: var(--gray-700);
+  margin-bottom: 0.75rem;
+}
+
+.daysGrid {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dayButton {
+  width: 45px;
+  height: 45px;
+  border: 2px solid var(--gray-200);
+  border-radius: 50%;
+  background: white;
+  font-weight: 600;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dayButton:hover {
+  border-color: #f97316;
+  color: #f97316;
+}
+
+.dayButton.selected {
+  background: #f97316;
+  border-color: #f97316;
+  color: white;
+}
+
+.datesGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.dateButton {
+  padding: 0.5rem;
+  border: 2px solid var(--gray-200);
+  border-radius: 0.5rem;
+  background: white;
+  font-weight: 500;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dateButton:hover {
+  border-color: #f97316;
+  color: #f97316;
+}
+
+.dateButton.selected {
+  background: #f97316;
+  border-color: #f97316;
+  color: white;
+}
+
+.customDates {
+  margin-top: 1rem;
+}
+
+.customDates input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--gray-200);
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.hint {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--gray-500);
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .typeGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .datesGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
