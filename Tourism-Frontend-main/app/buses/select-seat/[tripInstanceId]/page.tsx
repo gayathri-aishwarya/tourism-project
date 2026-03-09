@@ -8,12 +8,15 @@ import {
   FaChair, FaUser, FaRestroom, FaBan,
   FaArrowLeft, FaShoppingCart, FaCheck, FaCrown, FaStar,
   FaUserCircle, FaPhone, FaEnvelope, FaCreditCard,
-  FaCouch, FaBed, FaExclamationTriangle
+  FaCouch, FaBed, FaExclamationTriangle, FaTimes
 } from 'react-icons/fa';
 import { adminBusApi } from '@/src/api/admin-bus.api';
 import { UserContext } from '@/src/contexts/Contexts';
 import { useContext } from 'react';
 import styles from './page.module.css';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import BusStripePaymentForm from '@/src/components/BusbookingRelated/BusStripePaymentForm';
 
 // Types
 interface Seat {
@@ -53,7 +56,16 @@ interface Passenger {
   name: string;
   age: number;
   gender: 'male' | 'female' | 'other';
-  price: number; // Store the price for this passenger
+  price: number;
+}
+
+interface BookingConfirmation {
+  _id: string;
+  booking_reference: string;
+  total_fare: number;
+  booking_status: string;
+  trip_instance_id: TripInstance;
+  seats: any[];
 }
 
 export default function SeatSelectionPage() {
@@ -67,8 +79,12 @@ export default function SeatSelectionPage() {
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [bookingStep, setBookingStep] = useState<'seats' | 'details' | 'payment'>('seats');
+  const [bookingStep, setBookingStep] = useState<'seats' | 'details' | 'payment' | 'success'>('seats');
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [bookingId, setBookingId] = useState<string | null>(null);
+  const [bookingConfirmation, setBookingConfirmation] = useState<BookingConfirmation | null>(null);
+  const [processingPayment, setProcessingPayment] = useState(false);
   
   // Passenger details state
   const [passengers, setPassengers] = useState<Passenger[]>([]);
@@ -76,6 +92,19 @@ export default function SeatSelectionPage() {
     email: user?.email || '',
     phone: '',
   });
+
+  // ✅ Stripe initialization
+  const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+  
+  useEffect(() => {
+    console.log('🔑 Stripe Key from env:', stripeKey ? '✅ Found' : '❌ Missing');
+  }, [stripeKey]);
+
+  if (!stripeKey) {
+    console.error('❌ Stripe publishable key is missing! Check your .env.local file');
+  }
+
+  const stripePromise = loadStripe(stripeKey!);
 
   useEffect(() => {
     if (params && params.tripInstanceId) {
@@ -113,21 +142,27 @@ const loadTripData = async () => {
     setLoading(true);
     setError(null);
 
-    // Get trip instance details (this is already public via /:id)
+    console.log('📡 Loading trip data for ID:', tripInstanceId);
+    
+    // Get trip instance details
     const response = await adminBusApi.getTripInstance(tripInstanceId);
+    console.log('📦 Trip response:', response);
+    
     const tripData = response.instance;
     setTrip(tripData);
 
-    // Get bus layout using PUBLIC endpoint (no auth required)
+    // Get bus layout using PUBLIC endpoint
     const busId = tripData.trip_template_id.bus_id._id;
-    const busResponse = await adminBusApi.getBusPublic(busId); // Changed to getBusPublic
+    const busResponse = await adminBusApi.getBusPublic(busId);
     const busData = busResponse.bus;
 
     const parsedSeats = parseSeatLayout(busData, tripData.booked_seats || [], tripData.trip_template_id.ticket_price);
+    console.log('💺 Parsed seats:', parsedSeats.length);
+    
     setSeats(parsedSeats);
 
   } catch (err: any) {
-    console.error('Error loading trip:', err);
+    console.error('❌ Error loading trip:', err);
     setError(err.message || 'Failed to load trip details');
   } finally {
     setLoading(false);
@@ -261,31 +296,55 @@ const loadTripData = async () => {
   const handleProceedToPayment = () => {
     if (validatePassengerDetails()) {
       setBookingStep('payment');
+      // Automatically trigger booking creation
+      setTimeout(() => {
+        handleBooking();
+      }, 100);
     }
   };
-
-  
 
   const handleBooking = async () => {
     try {
       setValidationError(null);
+      setProcessingPayment(true);
+      
+      console.log('🔄 handleBooking started');
       
       // Final validation before booking
       if (!validatePassengerDetails()) {
+        console.log('❌ Validation failed');
+        setProcessingPayment(false);
+        return;
+      }
+
+      // Check if tripInstanceId exists
+      if (!tripInstanceId) {
+        console.log('❌ No tripInstanceId');
+        setValidationError('Trip instance ID is missing');
+        setProcessingPayment(false);
+        return;
+      }
+
+      // Check if trip exists
+      if (!trip) {
+        console.log('❌ No trip data');
+        setValidationError('Trip data is missing');
+        setProcessingPayment(false);
         return;
       }
 
       // Calculate final total with age-based pricing
-      const basePrice = trip?.trip_template_id.ticket_price || 0;
+      const basePrice = trip.trip_template_id.ticket_price || 0;
       const adultPrice = basePrice;
-      const childPrice = adultPrice / 2; // Half price for under 5
+      const childPrice = adultPrice / 2;
 
-      // Recalculate total fare based on ages (backend will do this too, but we show it)
       const calculatedTotal = passengers.reduce((sum, p) => {
         return sum + (p.age < 5 ? childPrice : adultPrice);
       }, 0);
 
-      // Create booking payload matching backend expectations
+      console.log('💰 Calculated total:', calculatedTotal);
+
+      // Create booking payload
       const bookingData = {
         trip_instance_id: tripInstanceId,
         seats: passengers.map(p => ({
@@ -298,20 +357,64 @@ const loadTripData = async () => {
         total_fare: calculatedTotal
       };
 
-      console.log('Booking data:', bookingData);
+      console.log('📦 Creating booking:', bookingData);
       
-      // Call your booking API
-      // const response = await adminBusApi.createBooking(bookingData);
+      // Create the booking
+      const bookingResponse = await adminBusApi.createBooking(bookingData);
+      console.log('📦 Booking response:', bookingResponse);
       
-      // Redirect to success page with booking ID
-      // router.push(`/booking-success/${response.booking._id}`);
+      // Check if booking was created successfully
+      if (!bookingResponse || !bookingResponse.booking) {
+        throw new Error('Failed to create booking');
+      }
       
-      // For now, just show success
-      alert('Booking successful! (Demo mode)');
+      const newBookingId = bookingResponse.booking._id;
+      setBookingId(newBookingId);
+      console.log('✅ Booking created with ID:', newBookingId);
+
+      // Create payment intent
+      console.log('💳 Creating payment intent for amount:', calculatedTotal);
+      const paymentResponse = await adminBusApi.createBusPaymentIntent({
+        amount: calculatedTotal,
+        bookingId: newBookingId
+      });
+
+      console.log('💳 Payment response:', paymentResponse);
+
+      if (!paymentResponse || !paymentResponse.clientSecret) {
+        console.error('❌ No clientSecret in response:', paymentResponse);
+        throw new Error('Failed to create payment intent');
+      }
+
+      console.log('✅ Client secret received');
+      setClientSecret(paymentResponse.clientSecret);
+      setProcessingPayment(false);
       
     } catch (error: any) {
-      console.error('Booking failed:', error);
-      setValidationError(error.response?.data?.message || 'Booking failed. Please try again.');
+      console.error('❌ Booking failed:', error);
+      setValidationError(error.response?.data?.message || error.message || 'Booking failed. Please try again.');
+      setProcessingPayment(false);
+    }
+  };
+
+  // Handle payment success
+  const handlePaymentSuccess = async () => {
+    if (bookingId) {
+      try {
+        console.log('💰 Payment successful, fetching booking details...');
+        
+        // Fetch the complete booking details
+        const bookingDetails = await adminBusApi.getBusBookingDetails(bookingId);
+        setBookingConfirmation(bookingDetails.booking);
+        
+        // Show success screen instead of redirecting
+        setBookingStep('success');
+        
+      } catch (error) {
+        console.error('❌ Error fetching booking details:', error);
+        // Still show success even if details fetch fails
+        setBookingStep('success');
+      }
     }
   };
 
@@ -559,7 +662,76 @@ const loadTripData = async () => {
 
         {/* Right Column - Booking Flow */}
         <div className={styles.bookingFlow}>
-          {bookingStep === 'seats' && (
+          {bookingStep === 'success' && bookingConfirmation ? (
+            <div className={styles.successCard}>
+              <button 
+                onClick={() => router.push('/buses')} 
+                className={styles.closeSuccessBtn}
+                title="Close and go to search"
+              >
+                <FaTimes />
+              </button>
+              
+              <div className={styles.successIcon}>
+                <FaCheck />
+              </div>
+              
+              <h2>Booking Successful!</h2>
+              <p className={styles.successMessage}>Your seats have been confirmed</p>
+              
+              <div className={styles.bookingDetails}>
+                <h3>Booking Details</h3>
+                
+                <div className={styles.detailItem}>
+                  <span>Booking Reference:</span>
+                  <strong>{bookingConfirmation.booking_reference}</strong>
+                </div>
+                
+                <div className={styles.detailItem}>
+                  <span>Route:</span>
+                  <strong>{template.from_location} → {template.to_location}</strong>
+                </div>
+                
+                <div className={styles.detailItem}>
+                  <span>Date:</span>
+                  <strong>{formatDate(trip.travel_date)}</strong>
+                </div>
+                
+                <div className={styles.detailItem}>
+                  <span>Time:</span>
+                  <strong>{formatTime(template.departure_time)}</strong>
+                </div>
+                
+                <div className={styles.detailItem}>
+                  <span>Bus:</span>
+                  <strong>{bus.vehicle_no}</strong>
+                </div>
+                
+                <div className={styles.seatsSummary}>
+                  <h4>Seats</h4>
+                  {bookingConfirmation.seats?.map((seat: any, index: number) => (
+                    <div key={index} className={styles.seatSummaryItem}>
+                      <span>Seat {seat.seat_number}</span>
+                      <span>{seat.passenger_name}</span>
+                      <span>EGP {seat.price_paid}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className={styles.totalPaid}>
+                  <span>Total Paid:</span>
+                  <strong>EGP {bookingConfirmation.total_fare}</strong>
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => router.push('/buses')}
+                className={styles.doneBtn}
+              >
+                Done
+              </button>
+            </div>
+          ) : bookingStep === 'seats' && (
             <div className={styles.selectionCard}>
               <h3>Your Selection</h3>
               
@@ -702,8 +874,9 @@ const loadTripData = async () => {
                 <button 
                   className={styles.proceedBtn}
                   onClick={handleProceedToPayment}
+                  disabled={processingPayment}
                 >
-                  Proceed to Payment
+                  {processingPayment ? 'Processing...' : 'Proceed to Payment'}
                 </button>
               </div>
             </div>
@@ -719,6 +892,7 @@ const loadTripData = async () => {
                 </div>
               )}
               
+              {/* Booking Summary */}
               <div className={styles.paymentSummary}>
                 <h4>Booking Summary</h4>
                 {passengers.map((p, i) => {
@@ -739,45 +913,41 @@ const loadTripData = async () => {
                 </div>
               </div>
 
-              <div className={styles.paymentMethods}>
-                <h4>Payment Method</h4>
-                <label className={styles.paymentOption}>
-                  <input type="radio" name="payment" defaultChecked />
-                  <FaCreditCard /> Credit / Debit Card
-                </label>
-              </div>
-
-              <div className={styles.buttonGroup}>
-                <button 
-                  className={styles.backBtn}
-                  onClick={() => setBookingStep('details')}
-                >
-                  Back
-                </button>
-                <button 
-                  className={styles.payBtn}
-                  onClick={handleBooking}
-                >
-                  Pay EGP {totalPrice}
-                </button>
-              </div>
+              {/* Payment Form */}
+              {!clientSecret ? (
+                <div className={styles.loadingContainer}>
+                  <div className={styles.loadingSpinner}></div>
+                  <p>Preparing payment...</p>
+                </div>
+              ) : (
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <BusStripePaymentForm
+                    clientSecret={clientSecret}
+                    amount={totalPrice}
+                    onSuccess={handlePaymentSuccess}
+                    onError={(error) => setValidationError(error)}
+                  />
+                </Elements>
+              )}
             </div>
           )}
 
-          {/* Trip Summary Card */}
-          <div className={styles.tripCard}>
-            <h4>Trip Details</h4>
-            <div className={styles.tripDetails}>
-              <p><strong>From:</strong> {template.from_location}</p>
-              <p><strong>To:</strong> {template.to_location}</p>
-              <p><strong>Date:</strong> {formatDate(trip.travel_date)}</p>
-              <p><strong>Time:</strong> {formatTime(template.departure_time)}</p>
-              <p><strong>Bus:</strong> {bus.vehicle_no}</p>
-              <p><strong>Available:</strong> {trip.available_seats} seats</p>
-              <p><strong>Base Price:</strong> EGP {basePrice}</p>
-              <p><small>Children under 5 get 50% discount</small></p>
+          {/* Trip Summary Card - Always visible */}
+          {bookingStep !== 'success' && (
+            <div className={styles.tripCard}>
+              <h4>Trip Details</h4>
+              <div className={styles.tripDetails}>
+                <p><strong>From:</strong> {template.from_location}</p>
+                <p><strong>To:</strong> {template.to_location}</p>
+                <p><strong>Date:</strong> {formatDate(trip.travel_date)}</p>
+                <p><strong>Time:</strong> {formatTime(template.departure_time)}</p>
+                <p><strong>Bus:</strong> {bus.vehicle_no}</p>
+                <p><strong>Available:</strong> {trip.available_seats} seats</p>
+                <p><strong>Base Price:</strong> EGP {basePrice}</p>
+                <p><small>Children under 5 get 50% discount</small></p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

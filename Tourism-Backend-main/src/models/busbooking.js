@@ -29,10 +29,26 @@ const BusBookingSchema = new mongoose.Schema(
       required: true,
       min: 0 
     },
+    // ✅ ADD THESE PAYMENT FIELDS
+    payment_status: {
+      type: String,
+      enum: ['pending', 'paid', 'failed', 'refunded'],
+      default: 'pending'
+    },
+    payment_intent_id: {
+      type: String,
+      unique: true,
+      sparse: true // Allows multiple null values
+    },
+    payment_method: {
+      type: String,
+      enum: ['card', 'cash'],
+      default: 'card'
+    },
     booking_status: {
       type: String,
-      enum: ['confirmed', 'cancelled', 'completed'],
-      default: 'confirmed'
+      enum: ['pending', 'confirmed', 'cancelled', 'completed'],
+      default: 'pending' // Changed from 'confirmed' to 'pending'
     },
     booking_date: { 
       type: Date, 
@@ -52,5 +68,10 @@ BusBookingSchema.virtual('seats', {
   localField: '_id',
   foreignField: 'busbooking_id'
 });
+
+// Index for faster queries
+BusBookingSchema.index({ payment_intent_id: 1 });
+BusBookingSchema.index({ payment_status: 1 });
+BusBookingSchema.index({ booking_status: 1 });
 
 module.exports = mongoose.model('BusBooking', BusBookingSchema);

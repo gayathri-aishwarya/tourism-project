@@ -1,4 +1,3 @@
-// server.js
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
@@ -29,9 +28,14 @@ app.use(
     })
 )
 
-// Middlewares
-app.use(express.json()) // parse JSON bodies
-app.use(morgan('dev'))  // logging
+// 🟢 IMPORTANT: Raw body parser for Stripe webhook (MUST come BEFORE express.json)
+app.use('/api/bus-payments/webhook', 
+  express.raw({ type: 'application/json' })
+);
+
+// Regular JSON parser for all other routes
+app.use(express.json());
+app.use(morgan('dev')); // logging
 
 // MongoDB connection
 mongoose
@@ -54,36 +58,38 @@ const busRoutes = require('./src/routes/admin/bus.routes')
 const tripTemplateRoutes = require('./src/routes/admin/triptemplate.routes');
 const tripInstanceRoutes = require('./src/routes/tripinstance.routes');
 const busBookingRoutes = require('./src/routes/busbooking.routes');
+const busPaymentRoutes = require('./src/routes/buspayment.routes');
+
 // Mount routes
-app.use('/api/auth', authRoutes)
-app.use('/api/users', userRoutes)
-app.use('/api/branches', branchRoutes)
-app.use('/api/locations', locationRoutes)
-app.use('/api/products', productRoutes)
-app.use('/api/bundles', bundleRoutes)
-app.use('/api/bookings', bookingRoutes)
-app.use('/api/payments', paymentRoutes)
-app.use('/api/holidays', holidaysRoutes)
-app.use('/api/analytics', analyticsRoutes)
+app.use('/api/bus-payments', busPaymentRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/branches', branchRoutes);
+app.use('/api/locations', locationRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/bundles', bundleRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/holidays', holidaysRoutes);
+app.use('/api/analytics', analyticsRoutes);
 app.use('/api/buses', busRoutes);
 app.use('/api/trip-templates', tripTemplateRoutes);
 app.use('/api/trip-instances', tripInstanceRoutes);
 app.use('/api/bus-bookings', busBookingRoutes);
 
-
-
 // 404 handler
 app.use((req, res) => {
-    console.log(`404 hit for ${req.method} ${req.url}`)
-    res.status(404).json({ message: 'Not Found' })
-})
+    console.log(`404 hit for ${req.method} ${req.url}`);
+    res.status(404).json({ message: 'Not Found' });
+});
 
-  app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ success: false, message: err.message });
+// Error handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ success: false, message: err.message });
 });
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`)
-})
+    console.log(`Server is running on http://localhost:${PORT}`);
+});

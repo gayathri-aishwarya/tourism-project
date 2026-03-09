@@ -1,3 +1,4 @@
+// Tourism-Backend-main/src/models/TripInstance.js
 const mongoose = require('mongoose');
 
 const TripInstanceSchema = new mongoose.Schema(
@@ -39,7 +40,7 @@ const TripInstanceSchema = new mongoose.Schema(
   { 
     timestamps: true,
     indexes: [
-      { trip_template_id: 1, travel_date: 1 }, // Compound index for quick lookup
+      { trip_template_id: 1, travel_date: 1 },
       { travel_date: 1 },
       { status: 1 }
     ]
@@ -49,4 +50,5 @@ const TripInstanceSchema = new mongoose.Schema(
 // Ensure unique trip per date
 TripInstanceSchema.index({ trip_template_id: 1, travel_date: 1 }, { unique: true });
 
-module.exports = mongoose.model('tripinstance', TripInstanceSchema);
+// ✅ FIXED: Use 'TripInstance' with capital T to match the import
+module.exports = mongoose.model('TripInstance', TripInstanceSchema);

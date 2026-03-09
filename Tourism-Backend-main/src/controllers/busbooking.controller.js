@@ -4,11 +4,9 @@ const TripInstance = require('../models/tripinstance');
 const TripTemplate = require('../models/triptemplate');
 const mongoose = require('mongoose');
 
-// --- Create BusBooking
+// --- Create BusBooking (WITHOUT transactions - works with standalone MongoDB)
 const createBusBooking = async (req, res, next) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
+  // REMOVED: session and transaction code
   try {
     const { trip_instance_id, seats, phone } = req.body;
 
@@ -56,15 +54,13 @@ const createBusBooking = async (req, res, next) => {
       });
     }
 
-    // 5️⃣ Get TripInstance with session
-    const instance = await TripInstance.findById(trip_instance_id).session(session);
+    // 5️⃣ Get TripInstance (NO session)
+    const instance = await TripInstance.findById(trip_instance_id);
     if (!instance) {
-      await session.abortTransaction();
       return res.status(404).json({ success: false, message: 'TripInstance not found' });
     }
     
     if (instance.status !== 'active') {
-      await session.abortTransaction();
       return res.status(400).json({ success: false, message: 'Trip is not active' });
     }
 
@@ -75,7 +71,6 @@ const createBusBooking = async (req, res, next) => {
     travelDate.setHours(0, 0, 0, 0);
     
     if (travelDate < today) {
-      await session.abortTransaction();
       return res.status(400).json({ success: false, message: 'Cannot book past trips' });
     }
 
@@ -83,7 +78,6 @@ const createBusBooking = async (req, res, next) => {
     const requestedSeats = seats.map(s => s.seat_number);
     const invalidSeats = requestedSeats.filter(s => !instance.all_seats.includes(s));
     if (invalidSeats.length > 0) {
-      await session.abortTransaction();
       return res.status(400).json({
         success: false,
         message: `Invalid seat numbers: ${invalidSeats.join(', ')}`
@@ -92,7 +86,6 @@ const createBusBooking = async (req, res, next) => {
 
     const alreadyBooked = requestedSeats.filter(s => instance.booked_seats.includes(s));
     if (alreadyBooked.length > 0) {
-      await session.abortTransaction();
       return res.status(400).json({
         success: false,
         message: `Seats already booked: ${alreadyBooked.join(', ')}`
@@ -101,7 +94,6 @@ const createBusBooking = async (req, res, next) => {
 
     // 7️⃣ Check available seats count
     if (instance.available_seats < seats.length) {
-      await session.abortTransaction();
       return res.status(400).json({
         success: false,
         message: `Only ${instance.available_seats} seats available`
@@ -109,9 +101,8 @@ const createBusBooking = async (req, res, next) => {
     }
 
     // 8️⃣ Fetch TripTemplate price
-    const tripTemplate = await TripTemplate.findById(instance.trip_template_id).session(session);
+    const tripTemplate = await TripTemplate.findById(instance.trip_template_id);
     if (!tripTemplate) {
-      await session.abortTransaction();
       return res.status(404).json({ success: false, message: 'TripTemplate not found' });
     }
 
@@ -124,36 +115,34 @@ const createBusBooking = async (req, res, next) => {
       totalFare += s.age < 5 ? childPrice : adultPrice;
     });
 
-    // 🔟 Create main booking
-    const booking = await BusBooking.create([{
+    // 🔟 Create main booking (NO session array)
+    const booking = await BusBooking.create({
       user_id: req.user.id,
       trip_instance_id,
       phone,
       total_fare: totalFare,
-      booking_status: 'confirmed'
-    }], { session });
+      payment_status: 'pending',  // ✅ ADDED: Track payment status
+      booking_status: 'pending'    // ✅ CHANGED: from 'confirmed' to 'pending'
+    });
 
     // 1️⃣1️⃣ Create individual booking seats with price_paid
     const bookingSeats = seats.map(s => ({
-      busbooking_id: booking[0]._id,
+      busbooking_id: booking._id,
       seat_number: s.seat_number,
       passenger_name: s.passenger_name,
       age: s.age,
       price_paid: s.age < 5 ? childPrice : adultPrice
     }));
     
-    await BusBookingSeat.insertMany(bookingSeats, { session });
+    await BusBookingSeat.insertMany(bookingSeats);
 
     // 1️⃣2️⃣ Update TripInstance
     instance.booked_seats.push(...requestedSeats);
     instance.available_seats -= seats.length;
-    await instance.save({ session });
-
-    // 1️⃣3️⃣ Commit transaction
-    await session.commitTransaction();
+    await instance.save();
 
     // Populate the booking with seats for response
-    const populatedBooking = await BusBooking.findById(booking[0]._id)
+    const populatedBooking = await BusBooking.findById(booking._id)
       .populate('seats')
       .populate({
         path: 'trip_instance_id',
@@ -165,15 +154,12 @@ const createBusBooking = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: 'Booking successful',
+      message: 'Booking created successfully',
       booking: populatedBooking
     });
 
   } catch (error) {
-    await session.abortTransaction();
     next(error);
-  } finally {
-    session.endSession();
   }
 };
 
@@ -239,16 +225,13 @@ const getBusBookingDetails = async (req, res, next) => {
   }
 };
 
-// Cancel booking
+// Cancel booking (WITHOUT transactions)
 const cancelBusBooking = async (req, res, next) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
+  // REMOVED: session and transaction code
   try {
-    const booking = await BusBooking.findById(req.params.id).session(session);
+    const booking = await BusBooking.findById(req.params.id);
     
     if (!booking) {
-      await session.abortTransaction();
       return res.status(404).json({ 
         success: false, 
         message: 'Booking not found' 
@@ -258,7 +241,6 @@ const cancelBusBooking = async (req, res, next) => {
     // Check if user owns this booking or is admin
     if (booking.user_id.toString() !== req.user.id && 
         !['master_admin', 'employee'].includes(req.user.role)) {
-      await session.abortTransaction();
       return res.status(403).json({ 
         success: false, 
         message: 'Not authorized to cancel this booking' 
@@ -267,7 +249,6 @@ const cancelBusBooking = async (req, res, next) => {
 
     // Check if booking can be cancelled (not completed, not already cancelled)
     if (booking.booking_status === 'cancelled') {
-      await session.abortTransaction();
       return res.status(400).json({ 
         success: false, 
         message: 'Booking is already cancelled' 
@@ -275,18 +256,23 @@ const cancelBusBooking = async (req, res, next) => {
     }
 
     if (booking.booking_status === 'completed') {
-      await session.abortTransaction();
       return res.status(400).json({ 
         success: false, 
         message: 'Completed bookings cannot be cancelled' 
       });
     }
     
+    // Check if payment is already refunded
+    if (booking.payment_status === 'refunded') {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Booking already refunded' 
+      });
+    }
 
     // Get trip instance and check if travel date is in the future
-    const instance = await TripInstance.findById(booking.trip_instance_id).session(session);
+    const instance = await TripInstance.findById(booking.trip_instance_id);
     if (!instance) {
-      await session.abortTransaction();
       return res.status(404).json({ 
         success: false, 
         message: 'Trip instance not found' 
@@ -299,7 +285,6 @@ const cancelBusBooking = async (req, res, next) => {
     travelDate.setHours(0, 0, 0, 0);
     
     if (travelDate < today) {
-      await session.abortTransaction();
       return res.status(400).json({ 
         success: false, 
         message: 'Cannot cancel past or ongoing trips' 
@@ -309,7 +294,7 @@ const cancelBusBooking = async (req, res, next) => {
     // Get booked seats
     const bookedSeats = await BusBookingSeat.find({ 
       busbooking_id: booking._id 
-    }).session(session);
+    });
     
     const seatNumbers = bookedSeats.map(s => s.seat_number);
 
@@ -318,18 +303,17 @@ const cancelBusBooking = async (req, res, next) => {
       seat => !seatNumbers.includes(seat)
     );
     instance.available_seats += bookedSeats.length;
-    await instance.save({ session });
+    await instance.save();
 
     // Delete booking seats
     await BusBookingSeat.deleteMany({ 
       busbooking_id: booking._id 
-    }).session(session);
+    });
 
     // Update booking status to cancelled
     booking.booking_status = 'cancelled';
-    await booking.save({ session });
-
-    await session.commitTransaction();
+    booking.payment_status = 'refunded';  // ✅ Track refund status
+    await booking.save();
 
     res.status(200).json({ 
       success: true, 
@@ -337,10 +321,7 @@ const cancelBusBooking = async (req, res, next) => {
     });
 
   } catch (error) {
-    await session.abortTransaction();
     next(error);
-  } finally {
-    session.endSession();
   }
 };
 

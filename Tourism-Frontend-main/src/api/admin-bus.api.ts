@@ -75,6 +75,73 @@ export interface TripInstance {
 // ========== API SERVICE ==========
 
 export const adminBusApi = {
+
+  // ========== BUS BOOKINGS ==========
+// ========== BUS BOOKINGS ==========
+
+/**
+ * Create a new bus booking
+ */
+createBooking: async (bookingData: {
+  trip_instance_id: string;
+  seats: Array<{
+    seat_number: string;
+    passenger_name: string;
+    age: number;
+    gender: string;
+  }>;
+  phone: string;
+  total_fare: number;
+}) => {
+  try {
+    console.log('Creating booking with data:', bookingData);
+    const { data } = await axios.post('/bus-bookings', bookingData);
+    return data;
+  } catch (error) {
+    console.error('Error creating booking:', error);
+    throw error;
+  }
+},
+
+/**
+ * Get single booking details by ID
+ */
+getBusBookingDetails: async (id: string) => {
+  try {
+    console.log('📦 Fetching booking details for ID:', id);
+    const { data } = await axios.get(`/bus-bookings/${id}`);
+    return data;
+  } catch (error) {
+    console.error('Error fetching booking details:', error);
+    throw error;
+  }
+},
+
+/**
+ * Get all bookings of logged-in user
+ */
+getUserBusBookings: async () => {
+  try {
+    const { data } = await axios.get('/bus-bookings/my-bookings');
+    return data;
+  } catch (error) {
+    console.error('Error fetching user bookings:', error);
+    throw error;
+  }
+},
+
+/**
+ * Cancel a booking
+ */
+cancelBusBooking: async (id: string) => {
+  try {
+    const { data } = await axios.delete(`/bus-bookings/${id}/cancel`);
+    return data;
+  } catch (error) {
+    console.error('Error cancelling booking:', error);
+    throw error;
+  }
+},
   // ========== BUS MANAGEMENT ==========
   
   /**
@@ -361,6 +428,34 @@ getBusPublic: async (id: string) => {
     return data;
   } catch (error) {
     console.error('Error fetching bus public:', error);
+    throw error;
+  }
+},
+
+// ========== BUS PAYMENT METHODS ==========
+
+/**
+ * Create payment intent for bus booking
+ */
+createBusPaymentIntent: async (data: { amount: number; bookingId: string }) => {
+  try {
+    const { data: response } = await axios.post('/bus-payments/create-intent', data);
+    return response;
+  } catch (error) {
+    console.error('Error creating bus payment intent:', error);
+    throw error;
+  }
+},
+
+/**
+ * Confirm bus booking after payment
+ */
+confirmBusBooking: async (data: { paymentIntentId: string; bookingId: string }) => {
+  try {
+    const { data: response } = await axios.post('/bus-payments/confirm-booking', data);
+    return response;
+  } catch (error) {
+    console.error('Error confirming bus booking:', error);
     throw error;
   }
 },
